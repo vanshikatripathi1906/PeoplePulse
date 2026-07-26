@@ -7,7 +7,7 @@ import { SectionTitle } from "../common/SectionTitle";
 export function AnalyticsModule({ employees }) {
   const totalCount = employees && employees.length > 0 ? employees.length : 25;
   const todayObj = new Date();
-  const dayOfWeek = todayObj.getDay(); // 0 is Sunday, 1 is Mon...
+  const dayOfWeek = todayObj.getDay();
 
   const weeklyAttendanceData = [
     { day: "Monday", pct: 92, present: Math.round(totalCount * 0.92), wfh: Math.max(1, Math.round(totalCount * 0.04)), absent: Math.max(0, totalCount - Math.round(totalCount * 0.92) - Math.max(1, Math.round(totalCount * 0.04))) },
@@ -17,7 +17,6 @@ export function AnalyticsModule({ employees }) {
     { day: "Friday", pct: 90, present: Math.round(totalCount * 0.90), wfh: Math.max(2, Math.round(totalCount * 0.08)), absent: Math.max(0, totalCount - Math.round(totalCount * 0.90) - Math.max(2, Math.round(totalCount * 0.08))) },
   ];
 
-  // Default active day selection to current weekday index (or Monday if weekend)
   const defaultIndex = (dayOfWeek >= 1 && dayOfWeek <= 5) ? dayOfWeek - 1 : 0;
   const [activeDayIndex, setActiveDayIndex] = useState(defaultIndex);
   const activeDay = weeklyAttendanceData[activeDayIndex] || weeklyAttendanceData[0];
@@ -32,7 +31,6 @@ export function AnalyticsModule({ employees }) {
         title="Workforce Analytics & Trends"
       />
 
-      {/* Weekly Attendance Trend Chart Card */}
       <Card style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 10 }}>
           <div>
@@ -76,7 +74,6 @@ export function AnalyticsModule({ employees }) {
         </ResponsiveContainer>
       </Card>
 
-      {/* Day-by-Day Breakdowns Grid */}
       <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 10, color: "var(--ink-dim)" }}>
         Click any day card to view detailed breakdown below:
       </div>
@@ -115,7 +112,6 @@ export function AnalyticsModule({ employees }) {
         })}
       </div>
 
-      {/* Detailed Insights Summary */}
       <div className="nf-grid-2">
         <Card style={{ borderLeft: "4px solid #E8A33D" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>

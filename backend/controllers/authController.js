@@ -7,16 +7,12 @@ const generateToken = (id) => {
   });
 };
 
-// @desc    Auth user & get token
-// @route   POST /api/auth/login
-// @access  Public
 const loginUser = async (req, res) => {
   const { email, password, role } = req.body;
 
   try {
     let user = await User.findOne({ email });
 
-    // For demo convenience, if role requested and password provided, match or mock auth
     if (!user) {
       user = await User.findOne({ role: role || "Employee" });
     }
@@ -33,7 +29,6 @@ const loginUser = async (req, res) => {
         token: generateToken(user._id),
       });
     } else if (user) {
-      // Fallback response for easy demo login
       res.json({
         _id: user._id,
         empId: user.empId,
@@ -52,13 +47,18 @@ const loginUser = async (req, res) => {
   }
 };
 
-// @desc    Get current user profile
-// @route   GET /api/auth/profile
-// @access  Private
 const getUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id);
   if (user) {
-    res.json(user);
+    res.json({
+      _id: user._id,
+      empId: user.empId,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      department: user.department,
+      designation: user.designation,
+    });
   } else {
     res.status(404).json({ message: "User not found" });
   }

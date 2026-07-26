@@ -149,7 +149,6 @@ export function DashboardPage({ role, onLogout }) {
     const updatedList = [newEmp, ...employeesList];
     setEmployeesList(updatedList);
 
-    // Dynamic Overview Metrics Sync
     try {
       const savedMetrics = localStorage.getItem("peoplepulse_dashboard_metrics");
       const currentMetrics = savedMetrics ? JSON.parse(savedMetrics) : {};
@@ -160,7 +159,6 @@ export function DashboardPage({ role, onLogout }) {
       };
       localStorage.setItem("peoplepulse_dashboard_metrics", JSON.stringify(newMetrics));
 
-      // Broadcast Notification
       const savedNotifs = localStorage.getItem("peoplepulse_notifications");
       const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];
       const newNotif = {
@@ -181,7 +179,6 @@ export function DashboardPage({ role, onLogout }) {
     const updatedList = employeesList.filter((e) => e.empId !== empId && e.id !== empId);
     setEmployeesList(updatedList);
 
-    // Dynamic Overview Metrics Sync
     try {
       const savedMetrics = localStorage.getItem("peoplepulse_dashboard_metrics");
       const currentMetrics = savedMetrics ? JSON.parse(savedMetrics) : {};
@@ -192,7 +189,6 @@ export function DashboardPage({ role, onLogout }) {
       };
       localStorage.setItem("peoplepulse_dashboard_metrics", JSON.stringify(newMetrics));
 
-      // Broadcast Notification
       const savedNotifs = localStorage.getItem("peoplepulse_notifications");
       const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];
       const newNotif = {
@@ -234,10 +230,8 @@ export function DashboardPage({ role, onLogout }) {
     try {
       localStorage.setItem("peoplepulse_leave_requests", JSON.stringify(updated));
 
-      // Calculate total approved leaves
       const approvedCount = updated.filter((r) => r.status === "Approved").length;
 
-      // Sync metrics in localStorage
       const savedMetrics = localStorage.getItem("peoplepulse_dashboard_metrics");
       const currentMetrics = savedMetrics ? JSON.parse(savedMetrics) : {};
       const newMetrics = {
@@ -246,7 +240,6 @@ export function DashboardPage({ role, onLogout }) {
       };
       localStorage.setItem("peoplepulse_dashboard_metrics", JSON.stringify(newMetrics));
 
-      // Broadcast Notification if Approved
       if (newStatus === "Approved") {
         const targetReq = updated.find((r) => r.id === id);
         const savedNotifs = localStorage.getItem("peoplepulse_notifications");

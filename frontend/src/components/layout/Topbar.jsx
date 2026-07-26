@@ -8,7 +8,6 @@ export function Topbar({ role, setPage, employees = [], goProfile }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [showResults, setShowResults] = useState(false);
 
-  // Filter employees matching search term
   const matchedEmployees = searchTerm.trim()
     ? employees.filter(
         (e) =>
@@ -53,7 +52,6 @@ export function Topbar({ role, setPage, employees = [], goProfile }) {
           />
         )}
 
-        {/* Global Live Search Results Dropdown Overlay */}
         {showResults && searchTerm.trim().length > 0 && (
           <div
             style={{

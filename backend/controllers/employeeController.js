@@ -1,8 +1,5 @@
 const User = require("../models/User");
 
-// @desc    Get all employees
-// @route   GET /api/employees
-// @access  Private (Admin, Manager)
 const getEmployees = async (req, res) => {
   try {
     const { department, search } = req.query;
@@ -27,9 +24,6 @@ const getEmployees = async (req, res) => {
   }
 };
 
-// @desc    Get employee by ID
-// @route   GET /api/employees/:id
-// @access  Private
 const getEmployeeById = async (req, res) => {
   try {
     const employee = await User.findById(req.params.id).select("-password");
@@ -43,9 +37,6 @@ const getEmployeeById = async (req, res) => {
   }
 };
 
-// @desc    Create new employee
-// @route   POST /api/employees
-// @access  Private (Admin only)
 const createEmployee = async (req, res) => {
   try {
     const { empId, name, email, password, role, designation, department, experience, manager } = req.body;
@@ -73,9 +64,6 @@ const createEmployee = async (req, res) => {
   }
 };
 
-// @desc    Delete employee
-// @route   DELETE /api/employees/:id
-// @access  Private (Admin only)
 const deleteEmployee = async (req, res) => {
   try {
     const employee = await User.findById(req.params.id);

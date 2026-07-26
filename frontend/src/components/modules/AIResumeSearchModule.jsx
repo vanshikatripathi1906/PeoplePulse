@@ -9,13 +9,11 @@ export function AIResumeSearchModule({ employees }) {
   const [minRating, setMinRating] = useState(3);
   const [assignedMessage, setAssignedMessage] = useState(null);
 
-  // Extract query keywords
   const searchTags = query
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
 
-  // Strictly functional matching algorithm
   const matches = (employees || [])
     .map((emp) => {
       let matchedSkillCount = 0;
@@ -25,7 +23,6 @@ export function AIResumeSearchModule({ employees }) {
       const empText = `${emp.name} ${emp.designation} ${emp.department}`.toLowerCase();
 
       searchTags.forEach((tag) => {
-        // Check employee skill list
         const foundSkill = empSkills.find(
           (sk) => sk.name.toLowerCase().includes(tag) || tag.includes(sk.name.toLowerCase())
         );
@@ -40,7 +37,7 @@ export function AIResumeSearchModule({ employees }) {
       });
 
       if (searchTags.length === 0 || matchedSkillCount === 0) {
-        return null; // Zero match
+        return null;
       }
 
       const matchRatio = matchedSkillCount / searchTags.length;
@@ -52,7 +49,7 @@ export function AIResumeSearchModule({ employees }) {
         matchedSkillCount,
       };
     })
-    .filter(Boolean) // Remove null matches
+    .filter(Boolean)
     .sort((a, b) => b.matchPercentage - a.matchPercentage);
 
   const handleAssign = (empName) => {
@@ -73,7 +70,6 @@ export function AIResumeSearchModule({ employees }) {
         </div>
       )}
 
-      {/* Full-Width Spacious Search Controls Card */}
       <Card style={{ marginBottom: 24, padding: "24px 28px" }}>
         <h3 className="nf-h3" style={{ fontSize: 18, marginBottom: 4 }}>Search Candidates &amp; Workforce by Skills</h3>
         <div style={{ fontSize: 13, color: "var(--ink-dim)", marginBottom: 18 }}>
@@ -116,14 +112,12 @@ export function AIResumeSearchModule({ employees }) {
         </div>
       </Card>
 
-      {/* Top Skill Match Candidates Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <h3 className="nf-h3" style={{ margin: 0, fontSize: 16.5 }}>
           Top Skill Match Candidates ({matches.length})
         </h3>
       </div>
 
-      {/* Candidates Results Grid */}
       <div className="nf-grid-2" style={{ gap: 20 }}>
         {matches.map(({ emp, matchPercentage }) => {
           const color = DEPT_COLORS[emp.department] || "#2F8F82";
@@ -160,7 +154,6 @@ export function AIResumeSearchModule({ employees }) {
                 </div>
               </div>
 
-              {/* Skills Chips */}
               <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
                 {(emp.skills || []).map((sk) => (
                   <span

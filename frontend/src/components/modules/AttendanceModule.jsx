@@ -12,7 +12,6 @@ const MONTH_NAMES = [
 export function AttendanceModule({ role, employees }) {
   const isManagerOrAdmin = role === "Admin" || role === "Manager";
 
-  // Real-world dynamic system date
   const todayDateObj = new Date();
   const todayISO = todayDateObj.toISOString().slice(0, 10);
   const todayFormattedString = todayDateObj.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
@@ -20,11 +19,9 @@ export function AttendanceModule({ role, employees }) {
   const todayMonthIndex = todayDateObj.getMonth();
   const todayYearNum = todayDateObj.getFullYear();
 
-  // Current calendar month view state
   const [currentYear, setCurrentYear] = useState(todayYearNum);
   const [currentMonth, setCurrentMonth] = useState(todayMonthIndex);
 
-  // Persistent attendance punch state for today
   const [checkedIn, setCheckedIn] = useState(() => {
     try {
       const saved = localStorage.getItem(`peoplepulse_checkin_${todayISO}`);
@@ -81,7 +78,6 @@ export function AttendanceModule({ role, employees }) {
     } catch (e) {}
   };
 
-  // Admin & Manager Attendance Deletion / Reset Handler
   const handleDeleteAttendance = () => {
     if (!isManagerOrAdmin) return;
     try {
@@ -97,7 +93,6 @@ export function AttendanceModule({ role, employees }) {
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
 
-  // Prev / Next Month Handlers
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
       setCurrentMonth(11);
@@ -125,20 +120,16 @@ export function AttendanceModule({ role, employees }) {
     let status = null;
 
     if (currentYear < todayYearNum || (currentYear === todayYearNum && currentMonth < todayMonthIndex)) {
-      // Past months
       status = (day % 7 === 0 || day % 7 === 6) ? "H" : (day % 5 === 0 ? "WFH" : "P");
     } else if (currentYear === todayYearNum && currentMonth === todayMonthIndex) {
-      // Current Real-time Month
       if (day < todayDayNum) {
         status = (day % 7 === 0 || day % 7 === 6) ? "H" : (day % 5 === 0 ? "WFH" : "P");
       } else if (day === todayDayNum) {
         status = todayMarked ? "P" : (checkedIn ? "P" : null);
       } else {
-        // Future dates in current month are completely UNMARKED and blank
         status = null;
       }
     } else {
-      // Future months / years are completely UNMARKED
       status = null;
     }
 
@@ -158,7 +149,6 @@ export function AttendanceModule({ role, employees }) {
     <>
       <SectionTitle eyebrow="Time & Attendance" title="Attendance Calendar" />
 
-      {/* Check-In / Check-Out Control Widget */}
       <Card style={{ marginBottom: 24, padding: 22 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
           <div>
@@ -194,7 +184,6 @@ export function AttendanceModule({ role, employees }) {
               </Pill>
             )}
 
-            {/* Admin & Manager Attendance Deletion Control */}
             {isManagerOrAdmin && (todayMarked || checkedIn || checkInTime) && (
               <button
                 className="nf-btn ghost"
@@ -209,7 +198,6 @@ export function AttendanceModule({ role, employees }) {
         </div>
       </Card>
 
-      {/* Month & Year Navigation Header */}
       <Card style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -242,7 +230,6 @@ export function AttendanceModule({ role, employees }) {
           </div>
         </div>
 
-        {/* Calendar Grid */}
         <div className="nf-grid-7" style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 10 }}>
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((dayName) => (
             <div key={dayName} style={{ textAlign: "center", fontWeight: 700, fontSize: 12, color: "var(--ink-dim)", padding: "6px 0" }}>

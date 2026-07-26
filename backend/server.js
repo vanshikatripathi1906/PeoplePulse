@@ -11,17 +11,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Attempt DB connection
 connectDB();
 
-// Register Routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/employees", require("./routes/employeeRoutes"));
 app.use("/api/departments", require("./routes/departmentRoutes"));
 app.use("/api/leave", require("./routes/leaveRoutes"));
 app.use("/api/tasks", require("./routes/taskRoutes"));
 
-// Analytics endpoint
 app.get("/api/analytics", (req, res) => {
   res.json({
     hiringTrend: [

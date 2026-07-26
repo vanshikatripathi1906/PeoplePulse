@@ -136,14 +136,12 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
     localStorage.setItem("peoplepulse_activities", JSON.stringify(activitiesList));
   }, [activitiesList]);
 
-  // Modals state
   const [showMetricsModal, setShowMetricsModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
   const [showRankingsModal, setShowRankingsModal] = useState(false);
   const [editingActivity, setEditingActivity] = useState(null);
   const [notification, setNotification] = useState(null);
 
-  // Form states
   const [editMetricsForm, setEditMetricsForm] = useState(INITIAL_METRICS);
   const [eventForm, setEventForm] = useState({ title: "", day: "Tomorrow, 26 Jul", tag: "Company Wide" });
   const [editRankingsForm, setEditRankingsForm] = useState(INITIAL_TOP_PERFORMERS);
@@ -156,17 +154,14 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
     ? leaveRequests.filter((r) => r.status === "Approved").length
     : (metrics?.onLeave ?? 3);
 
-  // Safe metrics values
   const safeTotal = activeEmployees && activeEmployees.length > 0 ? activeEmployees.length : (metrics?.totalEmployees ?? 25);
   const safeLeave = approvedLeaveCount;
   const safePresent = Math.max(0, safeTotal - safeLeave);
   const safeDepts = metrics?.departments ?? 12;
   const safeBirthday = metrics?.birthdayToday ?? 2;
 
-  // Auto-calculated attendance percentage
   const calculatedPresentPct = ((safePresent / safeTotal) * 100).toFixed(1);
 
-  // Stat cards list
   const stats = [
     { label: "Total Employees", value: safeTotal.toString(), sub: "Active workforce team", icon: Users, accent: "#E8A33D" },
     { label: "Employees Present", value: safePresent.toString(), sub: `${calculatedPresentPct}% today — click to view`, icon: BadgeCheck, accent: "#2F8F82", clickType: "present" },
@@ -227,7 +222,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
     return [];
   };
 
-  // Save Overview Metrics Handler
   const handleSaveMetrics = (e) => {
     e.preventDefault();
     if (!isManagerOrAdmin) return;
@@ -249,7 +243,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
     setTimeout(() => setNotification(null), 3500);
   };
 
-  // Schedule Event Handler
   const handleScheduleEvent = (e) => {
     e.preventDefault();
     if (!isManagerOrAdmin || !eventForm.title.trim()) return;
@@ -270,7 +263,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
     setTimeout(() => setNotification(null), 3500);
   };
 
-  // Delete Completed Event Handler
   const handleDeleteEvent = (id, title) => {
     if (!isManagerOrAdmin) return;
     setEventsList(eventsList.filter((ev) => ev.id !== id));
@@ -278,7 +270,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Save Daily Top Performers Rankings Handler
   const handleSaveRankings = (e) => {
     e.preventDefault();
     if (!isManagerOrAdmin) return;
@@ -288,7 +279,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
     setTimeout(() => setNotification(null), 3500);
   };
 
-  // Delete Activity Handler
   const handleDeleteActivity = (id) => {
     if (!isManagerOrAdmin) return;
     setActivitiesList(activitiesList.filter((act) => act.id !== id));
@@ -296,7 +286,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Save Activity Edit Handler
   const handleSaveActivityEdit = (e) => {
     e.preventDefault();
     if (!isManagerOrAdmin || !editingActivity) return;
