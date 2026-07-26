@@ -13,7 +13,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
   const [tab, setTab] = useState("Overview");
   const [profileEmp, setProfileEmp] = useState(emp);
 
-  // Check if viewing own profile
   const isOwner = currentUser && (
     (currentUser.empId && currentUser.empId === profileEmp.empId) ||
     (currentUser.email && currentUser.email === profileEmp.email) ||
@@ -22,14 +21,12 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
 
   const isManagerOrAdmin = currentUser && (currentUser.role === "Manager" || currentUser.role === "Admin" || currentUser.department === "HR");
 
-  // Modals state
   const [showEditModal, setShowEditModal] = useState(false);
   const [showSkillModal, setShowSkillModal] = useState(false);
   const [showDocModal, setShowDocModal] = useState(false);
   const [showSummaryModal, setShowSummaryModal] = useState(false);
   const [notification, setNotification] = useState(null);
 
-  // Form states
   const [editForm, setEditForm] = useState({
     name: profileEmp.name,
     email: profileEmp.email,
@@ -48,7 +45,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
   const tabs = ["Overview", "Attendance", "Leave", "Performance", "Skills", "Documents"];
   const color = DEPT_COLORS[profileEmp.department] || "#2F8F82";
 
-  // Save profile edit
   const handleSaveProfile = (e) => {
     e.preventDefault();
     if (!isOwner) return;
@@ -67,7 +63,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
     setTimeout(() => setNotification(null), 3500);
   };
 
-  // Save Performance Summary Edit
   const handleSaveSummary = (e) => {
     e.preventDefault();
     const updated = { ...profileEmp, summaryText };
@@ -78,7 +73,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
     setTimeout(() => setNotification(null), 3500);
   };
 
-  // Add Skill
   const handleAddSkill = (e) => {
     e.preventDefault();
     if (!isOwner || !newSkill.name.trim()) return;
@@ -92,7 +86,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
     setTimeout(() => setNotification(null), 3500);
   };
 
-  // Delete Skill
   const handleDeleteSkill = (skillName) => {
     if (!isOwner) return;
     const updatedSkills = profileEmp.skills.filter((s) => s.name !== skillName);
@@ -103,7 +96,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Upload Document
   const handleUploadDoc = (e) => {
     e.preventDefault();
     if (!isOwner || !newDoc.title.trim()) return;
@@ -118,7 +110,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
     setTimeout(() => setNotification(null), 3500);
   };
 
-  // Delete Document
   const handleDeleteDoc = (docName) => {
     if (!isOwner) return;
     const currentDocs = profileEmp.documents || ["Resume", "Offer Letter", "ID Proof", "Certificates"];
@@ -130,7 +121,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Download File Blob
   const handleDownloadDoc = (docName) => {
     const fileContent = `PEOPLEPULSE HR PORTAL - OFFICIAL DOCUMENT\nDocument: ${docName}\nEmployee: ${profileEmp.name}\n`;
     const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
@@ -182,7 +172,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
         </div>
       </Card>
 
-      {/* Edit Profile Modal */}
       {showEditModal && isOwner && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 460, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -211,7 +200,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
         </div>
       )}
 
-      {/* Edit Performance Summary Modal (Manager Mode Only) */}
       {showSummaryModal && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 460, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -235,7 +223,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
         </div>
       )}
 
-      {/* Add Skill Modal */}
       {showSkillModal && isOwner && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 400, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -260,7 +247,6 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
         </div>
       )}
 
-      {/* Upload Document Modal */}
       {showDocModal && isOwner && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>

@@ -106,7 +106,6 @@ export function OrgChartModule({ role }) {
         </div>
       )}
 
-      {/* Edit Position Modal */}
       {editingNode && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -144,7 +143,6 @@ export function OrgChartModule({ role }) {
 
       <Card style={{ padding: 28 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 32, alignItems: "center" }}>
-          {/* Level 1 */}
           <div style={{ textAlign: "center", width: "100%" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-dim)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
               Level 1 — Executive Department Heads
@@ -158,7 +156,6 @@ export function OrgChartModule({ role }) {
 
           <div style={{ width: 2, height: 24, background: "var(--border)" }} />
 
-          {/* Level 2 */}
           <div style={{ textAlign: "center", width: "100%" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-dim)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
               Level 2 — Engineering &amp; Operations Managers
@@ -172,7 +169,6 @@ export function OrgChartModule({ role }) {
 
           <div style={{ width: 2, height: 24, background: "var(--border)" }} />
 
-          {/* Level 3 */}
           <div style={{ textAlign: "center", width: "100%" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-dim)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
               Level 3 — Engineering Leads &amp; Developers

@@ -134,7 +134,6 @@ export function AssetsModule({ role, employees }) {
         </div>
       )}
 
-      {/* Add Asset Modal */}
       {showAddModal && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -174,7 +173,6 @@ export function AssetsModule({ role, employees }) {
         </div>
       )}
 
-      {/* Edit Asset Modal */}
       {editingAsset && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -243,7 +241,6 @@ export function AssetsModule({ role, employees }) {
                   </div>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 14 }}>{ast.name}</div>
-                    {/* Request 3: Standard Inter font for serial subtext, not bold */}
                     <div style={{ fontSize: 12, color: "var(--ink-dim)", fontFamily: "'Inter', sans-serif", fontWeight: 400, marginTop: 2 }}>
                       S/N: {ast.serial} · {ast.category}
                     </div>

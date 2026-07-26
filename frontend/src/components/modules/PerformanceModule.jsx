@@ -98,7 +98,6 @@ export function PerformanceModule({ role, employees, onUpdateEmp }) {
         </div>
       )}
 
-      {/* Edit Performance Modal for Manager & Admin */}
       {editingEmp && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 460, width: "100%", margin: "auto", background: "var(--surface)" }}>

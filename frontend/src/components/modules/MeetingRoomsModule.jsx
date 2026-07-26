@@ -83,9 +83,6 @@ export function MeetingRoomsModule({ employees }) {
       title: reserveForm.title,
     };
 
-    setBookings([newBooking, ...bookings]);
-
-    // Request 2: Auto-add custom room to main rooms grid if it doesn't exist yet!
     const roomExists = rooms.some((r) => r.name.toLowerCase() === customRoomName.toLowerCase());
     if (!roomExists) {
       const newRoomObj = {
@@ -98,7 +95,6 @@ export function MeetingRoomsModule({ employees }) {
       };
       setRooms([newRoomObj, ...rooms]);
     } else {
-      // Mark existing room as Booked
       setRooms(rooms.map((r) => r.name.toLowerCase() === customRoomName.toLowerCase() ? { ...r, status: "Booked" } : r));
     }
 
@@ -171,7 +167,6 @@ export function MeetingRoomsModule({ employees }) {
         </div>
       )}
 
-      {/* Reserve Room Modal */}
       {showReserveModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -215,7 +210,6 @@ export function MeetingRoomsModule({ employees }) {
         </div>
       )}
 
-      {/* Edit Room Modal */}
       {editingRoom && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -251,7 +245,6 @@ export function MeetingRoomsModule({ employees }) {
         </div>
       )}
 
-      {/* Main Rooms Grid */}
       <div className="nf-grid-2" style={{ marginBottom: 20 }}>
         {rooms.map((r) => (
           <Card key={r.id}>

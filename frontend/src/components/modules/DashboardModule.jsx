@@ -326,7 +326,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
         </div>
       )}
 
-      {/* Edit Overview Metrics Modal (Admin/Manager Only) */}
       {showMetricsModal && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 540, width: "100%", maxHeight: "85vh", overflow: "auto", background: "var(--surface)" }}>
@@ -380,7 +379,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
         </div>
       )}
 
-      {/* Edit Activity Modal (Admin/Manager Only) */}
       {editingActivity && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -404,7 +402,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
         </div>
       )}
 
-      {/* Interactive Stat Card Modal */}
       {modalType && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 740, width: "100%", maxHeight: "80vh", overflow: "auto", background: "var(--surface)" }}>
@@ -459,7 +456,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
         </div>
       )}
 
-      {/* Schedule Event Modal (Admin/Manager Only) */}
       {showEventModal && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -485,7 +481,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
         </div>
       )}
 
-      {/* Update Daily Top Performers Modal (Admin/Manager Only) */}
       {showRankingsModal && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 500, width: "100%", maxHeight: "80vh", overflow: "auto", background: "var(--surface)" }}>
@@ -529,7 +524,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
         </div>
       )}
 
-      {/* Workforce Overview Stat Cards Grid */}
       <div className="nf-grid-5" style={{ marginBottom: 28 }}>
         {stats.map((s) => (
           <div key={s.label} onClick={() => s.clickType && setModalType(s.clickType)} style={{ cursor: s.clickType ? "pointer" : "default" }}>
@@ -538,9 +532,7 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
         ))}
       </div>
 
-      {/* Hiring Overview & Attendance Insights Cards */}
       <div className="nf-grid-2" style={{ marginBottom: 28 }}>
-        {/* Hiring Overview Card */}
         <Card>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
             <div className="nf-avatar sm" style={{ background: "#3B82F626", color: "#3B82F6" }}>
@@ -569,7 +561,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
           </div>
         </Card>
 
-        {/* Attendance Insights Card */}
         <Card>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
             <div className="nf-avatar sm" style={{ background: "#2F8F8226", color: "#2F8F82" }}>
@@ -611,9 +602,7 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
         </Card>
       </div>
 
-      {/* Upcoming Events & Top Performers Cards */}
       <div className="nf-grid-2" style={{ marginBottom: 28 }}>
-        {/* Upcoming Events Card */}
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -671,7 +660,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
           </div>
         </Card>
 
-        {/* Top Performers Card */}
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -687,7 +675,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
             )}
           </div>
 
-          {/* Employee of the Month Highlight Banner */}
           <div
             style={{
               display: "flex",
@@ -718,7 +705,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
             </div>
           </div>
 
-          {/* Top 5 Performers List */}
           <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-dim)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
             Top 5 Performers Ranking
           </div>
@@ -758,7 +744,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
         </Card>
       </div>
 
-      {/* Live Recent Activity Feed with Admin/Manager Edit & Delete Controls */}
       <div style={{ marginTop: 28 }}>
         <Card>
           <div style={{ display: "flex", alignItems: "center", justifyBetween: "space-between", marginBottom: 16 }}>
@@ -810,7 +795,6 @@ export function DashboardModule({ role, employees, leaveRequests = [], goProfile
                     </div>
                   </div>
 
-                  {/* Request 4: Admin/Manager Edit & Delete for Activity Feed */}
                   {isManagerOrAdmin && (
                     <div style={{ display: "flex", gap: 6 }}>
                       <button

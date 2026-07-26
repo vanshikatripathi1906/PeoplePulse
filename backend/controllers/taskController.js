@@ -2,8 +2,6 @@ const Task = require("../models/Task");
 
 const getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({});
-    // Group tasks into Kanban columns
     const board = {
       "To Do": tasks.filter((t) => t.status === "To Do"),
       "In Progress": tasks.filter((t) => t.status === "In Progress"),

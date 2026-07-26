@@ -19,9 +19,7 @@ export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave 
   const act = async (id, status) => {
     try {
       await updateLeaveStatusAPI(id, status);
-    } catch (err) {
-      // Fallback
-    }
+    } catch (err) {}
     if (onUpdateStatus) {
       onUpdateStatus(id, status);
     }
@@ -41,9 +39,7 @@ export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave 
     };
     try {
       await applyLeaveAPI(newReq);
-    } catch (err) {
-      // Fallback
-    }
+    } catch (err) {}
     if (onApplyLeave) {
       onApplyLeave(newReq);
     }

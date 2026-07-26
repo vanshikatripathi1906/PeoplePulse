@@ -59,7 +59,6 @@ export function TasksModule({ role, employees }) {
 
   const cols = Object.keys(board);
 
-  // Move task column handler
   const moveTask = (fromCol, toCol, taskId) => {
     if (fromCol === toCol) return;
     setBoard((prev) => {
@@ -72,7 +71,6 @@ export function TasksModule({ role, employees }) {
     });
   };
 
-  // Create Task Handler
   const handleCreateTask = async (e) => {
     e.preventDefault();
     if (!isManagerOrAdmin || !addForm.title.trim()) return;
@@ -88,9 +86,7 @@ export function TasksModule({ role, employees }) {
 
     try {
       await createTaskAPI(newTask);
-    } catch (err) {
-      // Fallback
-    }
+    } catch (err) {}
 
     setBoard((prev) => ({
       ...prev,
@@ -110,7 +106,6 @@ export function TasksModule({ role, employees }) {
     setTimeout(() => setNotification(null), 3500);
   };
 
-  // Open Edit Task Modal
   const handleOpenEdit = (colName, taskObj) => {
     if (!isManagerOrAdmin) return;
     setEditingTask(taskObj);
@@ -125,7 +120,6 @@ export function TasksModule({ role, employees }) {
     });
   };
 
-  // Save Edit Task Handler
   const handleSaveEditTask = (e) => {
     e.preventDefault();
     if (!editingTask || !isManagerOrAdmin) return;
@@ -157,7 +151,6 @@ export function TasksModule({ role, employees }) {
     setTimeout(() => setNotification(null), 3500);
   };
 
-  // Delete Task Handler (Admin & Manager)
   const handleDeleteTask = (colName, taskId, taskTitle) => {
     if (!isManagerOrAdmin) return;
     setBoard((prev) => ({
@@ -191,7 +184,6 @@ export function TasksModule({ role, employees }) {
         </div>
       )}
 
-      {/* New Task Modal */}
       {showAddModal && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 460, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -233,7 +225,6 @@ export function TasksModule({ role, employees }) {
         </div>
       )}
 
-      {/* Edit Task Modal */}
       {editingTask && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 460, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -276,7 +267,6 @@ export function TasksModule({ role, employees }) {
         </div>
       )}
 
-      {/* Row-Wise Stacked Horizontal Task Sections */}
       <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
         {cols.map((col) => (
           <div key={col} style={{ background: "var(--surface-alt)", padding: "20px 22px", borderRadius: 16, border: "1px solid var(--border)" }}>
@@ -295,7 +285,6 @@ export function TasksModule({ role, employees }) {
               {col.toUpperCase()}
             </div>
 
-            {/* Spacious 3-Column Horizontal Grid */}
             <div className="nf-grid-3">
               {board[col].map((t) => (
                 <Card key={t.id} style={{ padding: "18px 20px", margin: 0 }}>
@@ -316,7 +305,6 @@ export function TasksModule({ role, employees }) {
                     </div>
                   </div>
 
-                  {/* Controls */}
                   <div
                     style={{
                       display: "flex",
@@ -328,7 +316,6 @@ export function TasksModule({ role, employees }) {
                       flexWrap: "nowrap",
                     }}
                   >
-                    {/* Request 4: Employee role can only shift task to Completed */}
                     <select
                       className="nf-select"
                       style={{ fontSize: 11, padding: "4px 6px", flex: 1, minWidth: 0 }}
@@ -345,7 +332,6 @@ export function TasksModule({ role, employees }) {
                       )}
                     </select>
 
-                    {/* Edit & Delete buttons strictly hidden for Employee role */}
                     {isManagerOrAdmin && (
                       <>
                         <button

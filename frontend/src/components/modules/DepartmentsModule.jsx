@@ -120,7 +120,6 @@ export function DepartmentsModule({ role, departments }) {
         </div>
       )}
 
-      {/* New Department Modal */}
       {showAddModal && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -149,7 +148,6 @@ export function DepartmentsModule({ role, departments }) {
         </div>
       )}
 
-      {/* Edit Department Modal */}
       {editingDept && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -181,7 +179,6 @@ export function DepartmentsModule({ role, departments }) {
         </div>
       )}
 
-      {/* Departments Grid */}
       <div className="nf-grid-3">
         {deptList.map((d) => (
           <Card key={d.name} className="nf-dept-card">

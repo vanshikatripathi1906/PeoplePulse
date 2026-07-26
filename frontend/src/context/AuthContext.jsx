@@ -34,7 +34,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", userObj.token);
       localStorage.setItem("role", selectedRole);
     } catch (err) {
-      // Fallback mock session for instant demo login
       const mockUser = {
         role: selectedRole,
         name: selectedRole === "Admin" ? "Aman Verma" : selectedRole === "Manager" ? "Rahul Sharma" : "Vanshika Tripathi",
