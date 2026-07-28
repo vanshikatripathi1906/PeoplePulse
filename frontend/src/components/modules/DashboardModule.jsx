@@ -365,7 +365,6 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
   return (
     <>
       <SectionTitle
-        eyebrow={`${role} VIEW`}
         title={isEmployee ? "Employee Dashboard Overview" : isManager ? "Manager Dashboard Overview" : "Workforce Command Center"}
       />
 

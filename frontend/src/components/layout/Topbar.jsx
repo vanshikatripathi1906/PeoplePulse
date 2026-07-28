@@ -115,7 +115,6 @@ export function Topbar({ role, setPage, employees = [], goProfile }) {
         )}
       </div>
 
-      <span className="nf-role-tag">{role ? role.toUpperCase() : "GUEST"} MODE</span>
       <div style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
         <div style={{ fontSize: 12, fontWeight: 600, color: "var(--ink-dim)", display: "flex", alignItems: "center", gap: 6, padding: "5px 12px", background: "var(--surface-alt)", borderRadius: 20, border: "1px solid var(--border)" }}>
           <Calendar size={13} style={{ color: "var(--accent-2)" }} />
