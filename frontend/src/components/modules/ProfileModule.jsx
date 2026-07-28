@@ -11,7 +11,8 @@ import { DEPT_COLORS } from "../common/EmployeeBadge";
 
 export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
   const [tab, setTab] = useState("Overview");
-  const [profileEmp, setProfileEmp] = useState(emp);
+  const targetEmp = (currentUser && currentUser.role === "Employee") ? currentUser : (emp || currentUser);
+  const [profileEmp, setProfileEmp] = useState(targetEmp);
 
   const isOwner = currentUser && (
     (currentUser.empId && currentUser.empId === profileEmp.empId) ||
