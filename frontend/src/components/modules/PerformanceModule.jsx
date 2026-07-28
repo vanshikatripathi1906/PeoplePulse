@@ -28,7 +28,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
   const [perfForm, setPerfForm] = useState({ Technical: 8, Communication: 8, Leadership: 7, stars: 4 });
   const [notification, setNotification] = useState(null);
 
-  const isManagerOrAdmin = role === "Manager" || role === "Admin";
+  const isManager = role === "Manager";
   const isEmployee = role === "Employee";
 
   // Filter performance list strictly by current logged-in user for Employee role
@@ -47,7 +47,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
   }
 
   const handleOpenEdit = (emp) => {
-    if (!isManagerOrAdmin) return;
+    if (!isManager) return;
     const t = emp.perf?.Technical || 8;
     const c = emp.perf?.Communication || 8;
     const l = emp.perf?.Leadership || 7;
@@ -123,7 +123,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
         </div>
       )}
 
-      {editingEmp && isManagerOrAdmin && (
+      {editingEmp && isManager && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 460, width: "100%", margin: "auto", background: "var(--surface)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
@@ -197,7 +197,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
                       />
                     ))}
                   </div>
-                  {isManagerOrAdmin && (
+                  {isManager && (
                     <button className="nf-btn ghost sm" style={{ padding: "3px 8px", fontSize: 11 }} onClick={() => handleOpenEdit(emp)}>
                       <Edit3 size={12} /> Edit Rating
                     </button>
