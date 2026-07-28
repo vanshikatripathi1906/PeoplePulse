@@ -390,13 +390,13 @@ export function DashboardPage({ role, onLogout }) {
   } else if (currentPage === "attendance") {
     pageContent = <AttendanceModule role={role} employees={employeesList} />;
   } else if (currentPage === "leave") {
-    pageContent = <LeaveModule role={role} leaveRequests={leaveRequests} onUpdateStatus={handleUpdateLeaveStatus} onApplyLeave={handleApplyLeave} />;
+    pageContent = <LeaveModule role={role} leaveRequests={leaveRequests} onUpdateStatus={handleUpdateLeaveStatus} onApplyLeave={handleApplyLeave} currentUser={loggedInUser} />;
   } else if (currentPage === "departments") {
-    pageContent = <DepartmentsModule role={role} departments={DEPARTMENTS_DATA} />;
+    pageContent = <DepartmentsModule role={role} departments={DEPARTMENTS_DATA} currentUser={loggedInUser} />;
   } else if (currentPage === "tasks") {
-    pageContent = <TasksModule role={role} employees={employeesList} />;
+    pageContent = <TasksModule role={role} employees={employeesList} currentUser={loggedInUser} />;
   } else if (currentPage === "performance") {
-    pageContent = <PerformanceModule role={role} employees={employeesList} onUpdateEmp={handleUpdateEmployee} />;
+    pageContent = <PerformanceModule role={role} employees={employeesList} onUpdateEmp={handleUpdateEmployee} currentUser={loggedInUser} />;
   } else if (currentPage === "aisearch") {
     pageContent = <AIResumeSearchModule employees={employeesList} />;
   } else if (currentPage === "assets") {
@@ -410,7 +410,7 @@ export function DashboardPage({ role, onLogout }) {
   } else if (currentPage === "analytics") {
     pageContent = <AnalyticsModule employees={employeesList} />;
   } else if (currentPage === "notifications") {
-    pageContent = <NotificationsModule />;
+    pageContent = <NotificationsModule role={role} currentUser={loggedInUser} />;
   }
 
   return (

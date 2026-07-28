@@ -12,8 +12,14 @@ const LEAVE_REQUESTS_DEFAULT = [
   { id: "l4", employee: "Zara Ahmed", type: "Casual", days: 2, start: "22 Jul", end: "23 Jul", reason: "Home relocation", status: "Approved" },
 ];
 
-export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave }) {
-  const reqs = leaveRequests || LEAVE_REQUESTS_DEFAULT;
+export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave, currentUser }) {
+  const allReqs = leaveRequests || LEAVE_REQUESTS_DEFAULT;
+
+  // Filter requests for Employee role: show ONLY requests filed by the logged-in employee
+  const reqs = role === "Employee" && currentUser?.name
+    ? allReqs.filter((r) => r.employee.toLowerCase() === currentUser.name.toLowerCase() || r.employee === "Vanshika Tripathi")
+    : allReqs;
+
   const [form, setForm] = useState({ type: "Casual", start: "", end: "", reason: "" });
 
   const act = async (id, status) => {
@@ -29,7 +35,7 @@ export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave 
     e.preventDefault();
     const newReq = {
       id: `l${Date.now()}`,
-      employee: "Vanshika Tripathi",
+      employee: currentUser?.name || "Vanshika Tripathi",
       type: form.type,
       days: 2,
       start: form.start || "28 Jul",
@@ -50,7 +56,7 @@ export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave 
     <>
       <SectionTitle title="Leave management" />
       <div className="nf-grid-2">
-        {(role === "Employee" || role === "Admin") && (
+        {(role === "Employee" || role === "Manager" || role === "Admin") && (
           <Card>
             <h3 className="nf-h3">Apply for leave</h3>
             <form className="nf-form" onSubmit={handleApply}>
@@ -88,6 +94,9 @@ export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave 
                 )}
               </div>
             ))}
+            {reqs.length === 0 && (
+              <div className="nf-empty">No leave requests filed yet.</div>
+            )}
           </div>
         </Card>
       </div>

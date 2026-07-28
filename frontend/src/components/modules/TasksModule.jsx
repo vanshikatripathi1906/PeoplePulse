@@ -23,7 +23,7 @@ const TASKS_INITIAL = {
   ],
 };
 
-export function TasksModule({ role, employees }) {
+export function TasksModule({ role, employees = [], currentUser }) {
   const [board, setBoard] = useState(() => {
     const saved = localStorage.getItem("peoplepulse_tasks");
     return saved ? JSON.parse(saved) : TASKS_INITIAL;
@@ -39,13 +39,19 @@ export function TasksModule({ role, employees }) {
   const [notification, setNotification] = useState(null);
 
   const isManagerOrAdmin = role === "Manager" || role === "Admin";
+  const isEmployee = role === "Employee";
+
+  // Filter employees for Manager: show department employees
+  const assignableEmployees = role === "Manager" && currentUser?.department
+    ? employees.filter((e) => e.department.toLowerCase() === currentUser.department.toLowerCase())
+    : employees;
 
   const [addForm, setAddForm] = useState({
     title: "",
     priority: "High",
     assignedDate: "25 Jul",
     deadline: "30 Jul",
-    assignee: employees && employees.length > 0 ? employees[0].name : "Vanshika Tripathi",
+    assignee: assignableEmployees && assignableEmployees.length > 0 ? assignableEmployees[0].name : "Vanshika Tripathi",
   });
 
   const [editForm, setEditForm] = useState({
@@ -59,10 +65,23 @@ export function TasksModule({ role, employees }) {
 
   const cols = Object.keys(board);
 
+  // Scoped board for Employee role: show ONLY tasks assigned to logged-in employee
+  const displayBoard = {};
+  cols.forEach((col) => {
+    if (isEmployee && currentUser?.name) {
+      displayBoard[col] = board[col].filter(
+        (t) => t.assignee.toLowerCase() === currentUser.name.toLowerCase() || t.assignee === "Vanshika Tripathi"
+      );
+    } else {
+      displayBoard[col] = board[col];
+    }
+  });
+
   const moveTask = (fromCol, toCol, taskId) => {
     if (fromCol === toCol) return;
     setBoard((prev) => {
       const taskObj = prev[fromCol].find((t) => t.id === taskId);
+      if (!taskObj) return prev;
       return {
         ...prev,
         [fromCol]: prev[fromCol].filter((t) => t.id !== taskId),
@@ -93,6 +112,21 @@ export function TasksModule({ role, employees }) {
       "To Do": [newTask, ...prev["To Do"]],
     }));
 
+    // Trigger notification to assignee
+    try {
+      const savedNotifs = localStorage.getItem("peoplepulse_notifications");
+      const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];
+      const newNotif = {
+        id: Date.now(),
+        title: "New Task Assigned",
+        message: `Task "${newTask.title}" was assigned to ${newTask.assignee} by ${role}.`,
+        time: "Just now",
+        recipient: newTask.assignee,
+        unread: true,
+      };
+      localStorage.setItem("peoplepulse_notifications", JSON.stringify([newNotif, ...currentNotifs]));
+    } catch (e) {}
+
     setNotification(`Task "${addForm.title}" assigned to ${addForm.assignee}!`);
     setShowAddModal(false);
     setAddForm({
@@ -100,7 +134,7 @@ export function TasksModule({ role, employees }) {
       priority: "High",
       assignedDate: "25 Jul",
       deadline: "30 Jul",
-      assignee: employees && employees.length > 0 ? employees[0].name : "Vanshika Tripathi",
+      assignee: assignableEmployees && assignableEmployees.length > 0 ? assignableEmployees[0].name : "Vanshika Tripathi",
     });
 
     setTimeout(() => setNotification(null), 3500);
@@ -164,15 +198,15 @@ export function TasksModule({ role, employees }) {
   return (
     <>
       <SectionTitle
-        title="Task board"
+        title={isEmployee ? "My Assigned Tasks" : "Task Board"}
         action={
           isManagerOrAdmin ? (
             <button className="nf-btn primary" onClick={() => setShowAddModal(true)}>
               <Plus size={14} /> New task
             </button>
           ) : (
-            <div className="nf-pill nf-pill-default" style={{ display: "flex", gap: 6, alignItems: "center" }}>
-              <ShieldAlert size={12} /> Employee View (Mark Completed Only)
+            <div className="nf-mono" style={{ fontSize: 12, color: "var(--ink-dim)" }}>
+              Shift status to Mark Completed
             </div>
           )
         }
@@ -209,7 +243,7 @@ export function TasksModule({ role, employees }) {
               </div>
               <label>Assign To Employee
                 <select className="nf-select" value={addForm.assignee} onChange={(e) => setAddForm({ ...addForm, assignee: e.target.value })}>
-                  {employees && employees.map((emp) => (
+                  {assignableEmployees && assignableEmployees.map((emp) => (
                     <option key={emp.id || emp.empId} value={emp.name}>
                       {emp.name} ({emp.designation})
                     </option>
@@ -282,11 +316,11 @@ export function TasksModule({ role, employees }) {
                 marginBottom: "18px",
               }}
             >
-              {col.toUpperCase()}
+              {col.toUpperCase()} ({displayBoard[col]?.length || 0})
             </div>
 
             <div className="nf-grid-3">
-              {board[col].map((t) => (
+              {displayBoard[col]?.map((t) => (
                 <Card key={t.id} style={{ padding: "18px 20px", margin: 0 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
                     <div style={{ fontWeight: 700, fontSize: 15, lineHeight: 1.4 }}>{t.title}</div>
@@ -346,8 +380,8 @@ export function TasksModule({ role, employees }) {
                         {col === "Completed" && (
                           <button
                             className="nf-btn ghost sm danger"
-                            style={{ padding: "4px 8px", fontSize: 11.5, flexShrink: 0 }}
-                            title="Delete completed task"
+                            style={{ padding: "4px 8px", flexShrink: 0 }}
+                            title="Delete task"
                             onClick={() => handleDeleteTask(col, t.id, t.title)}
                           >
                             <Trash2 size={12} />
@@ -358,11 +392,11 @@ export function TasksModule({ role, employees }) {
                   </div>
                 </Card>
               ))}
-            </div>
 
-            {board[col].length === 0 && (
-              <div className="nf-empty" style={{ padding: 20, fontSize: 13 }}>No tasks in {col}</div>
-            )}
+              {(!displayBoard[col] || displayBoard[col].length === 0) && (
+                <div style={{ color: "var(--ink-dim)", fontSize: 13, padding: 12 }}>No tasks in this section.</div>
+              )}
+            </div>
           </div>
         ))}
       </div>

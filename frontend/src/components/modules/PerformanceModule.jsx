@@ -3,6 +3,7 @@ import { Edit3, CheckCircle2, ShieldAlert, Sparkles, Star } from "lucide-react";
 import { Card } from "../common/Card";
 import { SectionTitle } from "../common/SectionTitle";
 import { DEPT_COLORS } from "../common/EmployeeBadge";
+import { updateEmployeeAPI } from "../../services/api";
 
 export function generateAISummary(tech, comm, lead, stars) {
   const t = Number(tech) || 7;
@@ -22,13 +23,25 @@ export function generateAISummary(tech, comm, lead, stars) {
   }
 }
 
-export function PerformanceModule({ role, employees, onUpdateEmp }) {
+export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUser }) {
   const [editingEmp, setEditingEmp] = useState(null);
   const [perfForm, setPerfForm] = useState({ Technical: 8, Communication: 8, Leadership: 7, stars: 4 });
   const [notification, setNotification] = useState(null);
 
   const isManagerOrAdmin = role === "Manager" || role === "Admin";
-  const activeEmployeesList = employees || [];
+  const isEmployee = role === "Employee";
+
+  // Filter performance list by role
+  let displayEmployees = employees;
+  if (isEmployee && currentUser?.name) {
+    displayEmployees = employees.filter(
+      (e) => e.email?.toLowerCase() === currentUser.email?.toLowerCase() || e.name?.toLowerCase() === currentUser.name?.toLowerCase() || e.name === "Vanshika Tripathi"
+    );
+  } else if (role === "Manager" && currentUser?.department) {
+    displayEmployees = employees.filter(
+      (e) => e.department?.toLowerCase() === currentUser.department?.toLowerCase()
+    );
+  }
 
   const handleOpenEdit = (emp) => {
     if (!isManagerOrAdmin) return;
@@ -47,7 +60,7 @@ export function PerformanceModule({ role, employees, onUpdateEmp }) {
     });
   };
 
-  const handleSavePerf = (e) => {
+  const handleSavePerf = async (e) => {
     e.preventDefault();
     if (!editingEmp) return;
 
@@ -66,29 +79,45 @@ export function PerformanceModule({ role, employees, onUpdateEmp }) {
       aiSummary: aiSummary,
     };
 
-    const updated = {
-      ...editingEmp,
-      perf: updatedPerf,
-      summaryText: aiSummary,
-    };
+    const updatedEmp = { ...editingEmp, perf: updatedPerf };
 
-    if (onUpdateEmp) onUpdateEmp(updated);
+    try {
+      const targetId = editingEmp._id || editingEmp.id || editingEmp.empId;
+      await updateEmployeeAPI(targetId, updatedEmp);
+    } catch (err) {}
+
+    // Send notification to employee
+    try {
+      const savedNotifs = localStorage.getItem("peoplepulse_notifications");
+      const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];
+      const newNotif = {
+        id: Date.now(),
+        title: "Performance Rating Updated",
+        message: `Your performance rating was updated to ${stars} stars by ${role}.`,
+        time: "Just now",
+        recipient: editingEmp.name,
+        unread: true,
+      };
+      localStorage.setItem("peoplepulse_notifications", JSON.stringify([newNotif, ...currentNotifs]));
+    } catch (err) {}
+
+    if (onUpdateEmp) {
+      onUpdateEmp(updatedEmp);
+    }
+
     setEditingEmp(null);
-    setNotification(`Updated performance ratings & AI summary for ${editingEmp.name}!`);
+    setNotification(`Updated performance & AI review for ${editingEmp.name}!`);
     setTimeout(() => setNotification(null), 3500);
   };
 
   return (
     <>
       <SectionTitle
-        eyebrow="GROWTH & EVALUATION"
-        title="Performance Reviews"
+        title={isEmployee ? "My Performance & AI Review" : "Performance & AI Evaluations"}
         action={
-          !isManagerOrAdmin && (
-            <div className="nf-pill nf-pill-default" style={{ display: "flex", gap: 6, alignItems: "center" }}>
-              <ShieldAlert size={12} /> Rating Modification (Admin / Manager Mode Only)
-            </div>
-          )
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--ink-dim)" }}>
+            <Sparkles size={16} style={{ color: "#E8A33D" }} /> AI Assessment Engine Active
+          </div>
         }
       />
 
@@ -107,131 +136,105 @@ export function PerformanceModule({ role, employees, onUpdateEmp }) {
             </div>
             <form onSubmit={handleSavePerf} className="nf-form">
               <label>Star Rating (1 - 5 Stars)
-                <select
-                  className="nf-select"
-                  value={perfForm.stars}
-                  onChange={(e) => setPerfForm({ ...perfForm, stars: Number(e.target.value) })}
-                  required
-                >
-                  <option value={5}>5 Stars — Exceptional Performance</option>
-                  <option value={4}>4 Stars — Exceeds Expectations</option>
-                  <option value={3}>3 Stars — Meets Expectations</option>
-                  <option value={2}>2 Stars — Needs Improvement</option>
-                  <option value={1}>1 Star — Critical Review Required</option>
+                <select className="nf-select" value={perfForm.stars} onChange={(e) => setPerfForm({ ...perfForm, stars: e.target.value })}>
+                  <option value={5}>⭐⭐⭐⭐⭐ (5 Stars - Exceptional)</option>
+                  <option value={4}>⭐⭐⭐⭐ (4 Stars - Exceeds Expectations)</option>
+                  <option value={3}>⭐⭐⭐ (3 Stars - Meets Expectations)</option>
+                  <option value={2}>⭐⭐ (2 Stars - Needs Improvement)</option>
+                  <option value={1}>⭐ (1 Star - Critical Concern)</option>
                 </select>
               </label>
 
               <div style={{ display: "flex", gap: 10 }}>
                 <label style={{ flex: 1 }}>Technical (1-10)
-                  <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    className="nf-select"
-                    value={perfForm.Technical}
-                    onChange={(e) => setPerfForm({ ...perfForm, Technical: e.target.value })}
-                    required
-                  />
+                  <input type="number" min={1} max={10} className="nf-select" value={perfForm.Technical} onChange={(e) => setPerfForm({ ...perfForm, Technical: e.target.value })} required />
                 </label>
                 <label style={{ flex: 1 }}>Communication (1-10)
-                  <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    className="nf-select"
-                    value={perfForm.Communication}
-                    onChange={(e) => setPerfForm({ ...perfForm, Communication: e.target.value })}
-                    required
-                  />
+                  <input type="number" min={1} max={10} className="nf-select" value={perfForm.Communication} onChange={(e) => setPerfForm({ ...perfForm, Communication: e.target.value })} required />
                 </label>
                 <label style={{ flex: 1 }}>Leadership (1-10)
-                  <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    className="nf-select"
-                    value={perfForm.Leadership}
-                    onChange={(e) => setPerfForm({ ...perfForm, Leadership: e.target.value })}
-                    required
-                  />
+                  <input type="number" min={1} max={10} className="nf-select" value={perfForm.Leadership} onChange={(e) => setPerfForm({ ...perfForm, Leadership: e.target.value })} required />
                 </label>
               </div>
 
-              <div style={{ background: "var(--surface-alt)", padding: 12, borderRadius: 10, fontSize: 12, color: "var(--ink-dim)", marginTop: 10, border: "1px dashed var(--border)" }}>
-                <div style={{ fontWeight: 700, color: "var(--accent)", marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
-                  <Sparkles size={13} /> Live AI Summary Preview:
-                </div>
-                {generateAISummary(perfForm.Technical, perfForm.Communication, perfForm.Leadership, perfForm.stars)}
-              </div>
-
-              <div style={{ display: "flex", gap: 10, marginTop: 16, justifyContent: "flex-end" }}>
+              <div style={{ display: "flex", gap: 10, marginTop: 14, justifyContent: "flex-end" }}>
                 <button type="button" className="nf-btn ghost" onClick={() => setEditingEmp(null)}>Cancel</button>
-                <button type="submit" className="nf-btn primary">Save &amp; Generate AI Summary</button>
+                <button type="submit" className="nf-btn primary">Save &amp; Generate AI Review</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      <div className="nf-grid-3" style={{ gap: 24 }}>
-        {activeEmployeesList.map((e) => {
-          const perfObj = e.perf || { Technical: 8, Communication: 8, Leadership: 7 };
-          const t = perfObj.Technical || 8;
-          const c = perfObj.Communication || 8;
-          const l = perfObj.Leadership || 7;
-          const overall = ((t + c + l) / 3).toFixed(1);
-          const starsCount = perfObj.stars || Math.min(5, Math.max(1, Math.round(overall / 2)));
-          const color = DEPT_COLORS[e.department] || "#2F8F82";
+      <div className="nf-grid-2">
+        {displayEmployees.map((emp) => {
+          const color = DEPT_COLORS[emp.department] || "#6C6FB0";
+          const t = emp.perf?.Technical || 8;
+          const c = emp.perf?.Communication || 8;
+          const l = emp.perf?.Leadership || 7;
+          const calculatedStars = Math.min(5, Math.max(1, Math.round((t + c + l) / 6)));
+          const stars = emp.perf?.stars || calculatedStars;
+          const aiSummaryText = emp.perf?.aiSummary || generateAISummary(t, c, l, stars);
 
           return (
-            <Card key={e.id || e.empId} style={{ padding: 22 }}>
-              <div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                    <div className="nf-avatar" style={{ background: `${color}26`, color }}>{e.initials}</div>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: 14 }}>{e.name}</div>
-                      <div style={{ fontSize: 12, color: "var(--ink-dim)" }}>{e.designation}</div>
-                      <div style={{ fontSize: 11.5, fontWeight: 700, fontFamily: "'Inter', sans-serif", color: "var(--ink-dim)", marginTop: 1 }}>{e.empId}</div>
-                    </div>
+            <Card key={emp.empId || emp.id}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                  <div className="nf-avatar" style={{ background: `${color}26`, color: color, fontWeight: 700 }}>
+                    {emp.initials || "EM"}
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: 16 }}>{emp.name}</div>
+                    <div style={{ fontSize: 12, color: "var(--ink-dim)" }}>{emp.designation} · {emp.department}</div>
+                  </div>
+                </div>
+
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ display: "flex", gap: 2, justifyContent: "flex-end", marginBottom: 2 }}>
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        size={14}
+                        style={{
+                          color: i < stars ? "#E8A33D" : "var(--border)",
+                          fill: i < stars ? "#E8A33D" : "none",
+                        }}
+                      />
+                    ))}
                   </div>
                   {isManagerOrAdmin && (
-                    <button className="nf-btn ghost sm" style={{ padding: "4px 8px" }} onClick={() => handleOpenEdit(e)}>
-                      <Edit3 size={13} /> Edit
+                    <button className="nf-btn ghost sm" style={{ padding: "3px 8px", fontSize: 11 }} onClick={() => handleOpenEdit(emp)}>
+                      <Edit3 size={12} /> Edit Rating
                     </button>
                   )}
                 </div>
+              </div>
 
-                <div style={{ marginTop: 14 }}>
-                  <div className="nf-bar-row">
-                    <span>Technical</span>
-                    <div className="nf-bar-track"><div className="nf-bar-fill" style={{ width: `${t * 10}%` }} /></div>
-                    <span className="nf-mono">{t}</span>
-                  </div>
-                  <div className="nf-bar-row">
-                    <span>Communication</span>
-                    <div className="nf-bar-track"><div className="nf-bar-fill" style={{ width: `${c * 10}%` }} /></div>
-                    <span className="nf-mono">{c}</span>
-                  </div>
-                  <div className="nf-bar-row">
-                    <span>Leadership</span>
-                    <div className="nf-bar-track"><div className="nf-bar-fill" style={{ width: `${l * 10}%` }} /></div>
-                    <span className="nf-mono">{l}</span>
-                  </div>
+              <div style={{ background: "var(--surface-alt)", padding: "12px 14px", borderRadius: 10, fontSize: 12.5, lineHeight: 1.5, color: "var(--ink)", borderLeft: "3px solid #E8A33D", marginBottom: 14 }}>
+                {aiSummaryText}
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+                <div style={{ background: "var(--surface-alt)", padding: "8px 10px", borderRadius: 8, textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: "var(--ink-dim)" }}>Technical</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, marginTop: 2, color: "#38BDF8" }}>{t} / 10</div>
                 </div>
-
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
-                  <span className="nf-stars" style={{ color: "#E8A33D", fontSize: 16 }}>
-                    {"★".repeat(starsCount)}{"☆".repeat(5 - starsCount)}
-                  </span>
-                  <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: "14.5px", color: "var(--accent-2)" }}>
-                    {overall}/10
-                  </span>
+                <div style={{ background: "var(--surface-alt)", padding: "8px 10px", borderRadius: 8, textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: "var(--ink-dim)" }}>Communication</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, marginTop: 2, color: "#2F8F82" }}>{c} / 10</div>
+                </div>
+                <div style={{ background: "var(--surface-alt)", padding: "8px 10px", borderRadius: 8, textAlign: "center" }}>
+                  <div style={{ fontSize: 11, color: "var(--ink-dim)" }}>Leadership</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, marginTop: 2, color: "#E8A33D" }}>{l} / 10</div>
                 </div>
               </div>
             </Card>
           );
         })}
+
+        {displayEmployees.length === 0 && (
+          <div className="nf-empty">No performance records found.</div>
+        )}
       </div>
     </>
   );
