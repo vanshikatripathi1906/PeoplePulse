@@ -16,7 +16,15 @@ import { NotificationsModule } from "../components/modules/NotificationsModule";
 import { AIResumeSearchModule } from "../components/modules/AIResumeSearchModule";
 import { AssetsModule } from "../components/modules/AssetsModule";
 import { MeetingRoomsModule } from "../components/modules/MeetingRoomsModule";
-import { fetchEmployeesAPI, fetchPendingUsersAPI, approveUserAPI, rejectUserAPI } from "../services/api";
+import {
+  fetchEmployeesAPI,
+  createEmployeeAPI,
+  updateEmployeeAPI,
+  deleteEmployeeAPI,
+  fetchPendingUsersAPI,
+  approveUserAPI,
+  rejectUserAPI,
+} from "../services/api";
 
 function generateMockAttendance(seedNumber) {
   const attendanceList = [];
@@ -201,7 +209,7 @@ export function DashboardPage({ role, onLogout }) {
   if (role === "Admin") {
     loggedInUser = (employeesList && employeesList.length > 0 ? employeesList[0] : INITIAL_EMPLOYEES_DATA[0]);
   } else if (role === "Manager") {
-    loggedInUser = (employeesList && employeesList.length > 0 ? employeesList[2] || employeesList[0] : INITIAL_EMPLOYEES_DATA[0]);
+    loggedInUser = (employeesList && employeesList.length > 0 ? employeesList[1] || employeesList[0] : INITIAL_EMPLOYEES_DATA[0]);
   }
 
   const navigateToProfile = (targetEmployee) => {
@@ -209,9 +217,14 @@ export function DashboardPage({ role, onLogout }) {
     setCurrentPage("empProfile");
   };
 
-  const handleUpdateEmployee = (updatedEmployee) => {
+  const handleUpdateEmployee = async (updatedEmployee) => {
+    const targetId = updatedEmployee._id || updatedEmployee.id || updatedEmployee.empId;
+    try {
+      await updateEmployeeAPI(targetId, updatedEmployee);
+    } catch (e) {}
+
     const updatedList = employeesList.map((emp) => {
-      if (emp.empId === updatedEmployee.empId) {
+      if (emp.empId === updatedEmployee.empId || emp.id === targetId || emp._id === targetId) {
         return updatedEmployee;
       }
       return emp;
@@ -220,7 +233,14 @@ export function DashboardPage({ role, onLogout }) {
     setSelectedEmployee(updatedEmployee);
   };
 
-  const handleAddEmployee = (newEmp) => {
+  const handleAddEmployee = async (newEmp) => {
+    try {
+      const savedDoc = await createEmployeeAPI(newEmp);
+      if (savedDoc && savedDoc._id) {
+        newEmp._id = savedDoc._id;
+      }
+    } catch (e) {}
+
     const updatedList = [newEmp, ...employeesList];
     setEmployeesList(updatedList);
 
@@ -249,9 +269,14 @@ export function DashboardPage({ role, onLogout }) {
     }
   };
 
-  const handleDeleteEmployee = (empId) => {
-    const targetEmp = employeesList.find((e) => e.empId === empId || e.id === empId);
-    const updatedList = employeesList.filter((e) => e.empId !== empId && e.id !== empId);
+  const handleDeleteEmployee = async (empId) => {
+    const targetEmp = employeesList.find((e) => e.empId === empId || e.id === empId || e._id === empId);
+    const targetId = targetEmp?._id || targetEmp?.empId || empId;
+    try {
+      await deleteEmployeeAPI(targetId);
+    } catch (e) {}
+
+    const updatedList = employeesList.filter((e) => e.empId !== empId && e.id !== empId && e._id !== empId);
     setEmployeesList(updatedList);
 
     try {

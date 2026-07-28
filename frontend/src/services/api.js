@@ -42,6 +42,21 @@ export const fetchEmployeesAPI = async (params) => {
   return response.data;
 };
 
+export const createEmployeeAPI = async (empData) => {
+  const response = await API.post("/employees", empData);
+  return response.data;
+};
+
+export const updateEmployeeAPI = async (id, empData) => {
+  const response = await API.put(`/employees/${id}`, empData);
+  return response.data;
+};
+
+export const deleteEmployeeAPI = async (id) => {
+  const response = await API.delete(`/employees/${id}`);
+  return response.data;
+};
+
 export const fetchDepartmentsAPI = async () => {
   const response = await API.get("/departments");
   return response.data;

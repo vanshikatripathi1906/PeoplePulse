@@ -4,19 +4,19 @@ const {
   getEmployees,
   getEmployeeById,
   createEmployee,
+  updateEmployee,
   deleteEmployee,
 } = require("../controllers/employeeController");
-const { protect } = require("../middleware/authMiddleware");
-const { authorizeRoles } = require("../middleware/roleMiddleware");
 
 router
   .route("/")
-  .get(protect, getEmployees)
-  .post(protect, authorizeRoles("Admin"), createEmployee);
+  .get(getEmployees)
+  .post(createEmployee);
 
 router
   .route("/:id")
-  .get(protect, getEmployeeById)
-  .delete(protect, authorizeRoles("Admin"), deleteEmployee);
+  .get(getEmployeeById)
+  .put(updateEmployee)
+  .delete(deleteEmployee);
 
 module.exports = router;
