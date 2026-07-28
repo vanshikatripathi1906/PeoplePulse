@@ -23,11 +23,11 @@ const DEFAULT_METRICS = {
 };
 
 const DEFAULT_TOP_PERFORMERS = [
-  { name: "Aman Verma", role: "Engineering Head", score: 98, avatar: "AV", color: "#E8A33D" },
-  { name: "Aditi Tripathi", role: "Backend Developer", score: 96, avatar: "AT", color: "#38BDF8" },
-  { name: "Rahul Sharma", role: "Senior Engineering Manager", score: 94, avatar: "RS", color: "#2F8F82" },
-  { name: "Priya Nair", role: "Product Head", score: 92, avatar: "PN", color: "#6C6FB0" },
-  { name: "Vanshika Tripathi", role: "Frontend Developer", score: 91, avatar: "VT", color: "#EC4899" },
+  { name: "Aman Verma", role: "Engineering Head", score: 98, avatar: "AV", color: "#E8A33D", department: "Engineering" },
+  { name: "Aditi Tripathi", role: "Backend Developer", score: 96, avatar: "AT", color: "#38BDF8", department: "Engineering" },
+  { name: "Rahul Sharma", role: "Senior Engineering Manager", score: 94, avatar: "RS", color: "#2F8F82", department: "Engineering" },
+  { name: "Priya Nair", role: "Product Head", score: 92, avatar: "PN", color: "#6C6FB0", department: "Product" },
+  { name: "Vanshika Tripathi", role: "Frontend Developer", score: 91, avatar: "VT", color: "#EC4899", department: "Engineering" },
 ];
 
 const DEFAULT_EVENTS = [
@@ -42,11 +42,13 @@ const DEFAULT_ACTIVITIES = [
   { id: "a3", time: "3 hours ago", title: "Attendance Marked", text: "22 employees checked in for today.", type: "attendance" },
 ];
 
-export function DashboardModule({ role, employees = [], leaveRequests = [], goProfile }) {
+export function DashboardModule({ role, employees = [], leaveRequests = [], goProfile, currentUser }) {
   const isManagerOrAdmin = role === "Admin" || role === "Manager";
   const isAdmin = role === "Admin";
   const isManager = role === "Manager";
   const isEmployee = role === "Employee";
+
+  const userDept = currentUser?.department || "Engineering";
 
   const [metrics, setMetrics] = useState(() => {
     try {
@@ -82,34 +84,47 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
   const [eventForm, setEventForm] = useState({ title: "", day: "Tomorrow, 3:00 PM", tag: "General" });
   const [modalType, setModalType] = useState(null);
 
-  const activeEmployees = employees.length > 0 ? employees : Array(metrics.totalEmployees).fill({ name: "Employee", empId: "EMP-100", designation: "Staff", department: "Engineering" });
-
   const safeTotal = employees.length > 0 ? employees.length : metrics.totalEmployees;
   const safeApprovedLeave = leaveRequests.filter((r) => r.status === "Approved").length;
 
-  // DYNAMIC TOP PERFORMERS CALCULATED FROM MONGODB ATLAS DATABASE RECORDS
-  const computedTopPerformers = (employees && employees.length > 0)
-    ? [...employees]
-        .map((emp) => {
-          const t = Number(emp.perf?.Technical) || 8;
-          const c = Number(emp.perf?.Communication) || 8;
-          const l = Number(emp.perf?.Leadership) || 7;
-          const stars = Number(emp.perf?.stars) || Math.min(5, Math.max(1, Math.round((t + c + l) / 6)));
-          const score = Math.min(99, Math.round(((t + c + l) / 30) * 80 + stars * 4));
-          const avatar = emp.initials || (emp.name ? emp.name.split(" ").map((w) => w[0]).slice(0, 2).join("") : "EM");
-          return {
-            name: emp.name,
-            role: emp.designation || emp.role || "Team Member",
-            score: score,
-            avatar: avatar,
-            color: DEPT_COLORS[emp.department] || "#38BDF8",
-          };
-        })
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 5)
+  // DYNAMIC DEPARTMENT-WISE TOP PERFORMERS & RANKINGS FROM MONGODB ATLAS
+  const allScoredEmployees = (employees && employees.length > 0)
+    ? employees.map((emp) => {
+        const t = Number(emp.perf?.Technical) || 8;
+        const c = Number(emp.perf?.Communication) || 8;
+        const l = Number(emp.perf?.Leadership) || 7;
+        const stars = Number(emp.perf?.stars) || Math.min(5, Math.max(1, Math.round((t + c + l) / 6)));
+        const score = Math.min(99, Math.round(((t + c + l) / 30) * 80 + stars * 4));
+        const avatar = emp.initials || (emp.name ? emp.name.split(" ").map((w) => w[0]).slice(0, 2).join("") : "EM");
+        return {
+          name: emp.name,
+          email: emp.email,
+          empId: emp.empId,
+          department: emp.department || "Engineering",
+          role: emp.designation || emp.role || "Team Member",
+          score: score,
+          avatar: avatar,
+          color: DEPT_COLORS[emp.department] || "#38BDF8",
+        };
+      })
     : DEFAULT_TOP_PERFORMERS;
 
-  const employeeOfTheMonth = computedTopPerformers[0] || DEFAULT_TOP_PERFORMERS[0];
+  // Filter department top performers for Employee & Manager view
+  const deptRankedList = [...allScoredEmployees]
+    .filter((e) => !userDept || (e.department || "").toLowerCase() === userDept.toLowerCase())
+    .sort((a, b) => b.score - a.score);
+
+  const displayPerformers = deptRankedList.length > 0 ? deptRankedList.slice(0, 5) : allScoredEmployees.sort((a, b) => b.score - a.score).slice(0, 5);
+  const employeeOfTheMonth = deptRankedList[0] || allScoredEmployees[0] || DEFAULT_TOP_PERFORMERS[0];
+
+  // Calculate current logged in user's rank inside their department
+  const userIndexInDept = deptRankedList.findIndex(
+    (e) => (currentUser?.email && e.email?.toLowerCase() === currentUser.email.toLowerCase()) ||
+           (currentUser?.name && e.name?.toLowerCase() === currentUser.name.toLowerCase()) ||
+           e.name === "Vanshika Tripathi"
+  );
+  const userDeptRank = userIndexInDept !== -1 ? userIndexInDept + 1 : 1;
+  const userDeptScore = userIndexInDept !== -1 ? deptRankedList[userIndexInDept]?.score : 91;
 
   const stats = [
     { label: "TOTAL EMPLOYEES", value: safeTotal.toString(), sub: "active workforce", icon: Users, accent: "#E8A33D", clickType: "total" },
@@ -223,7 +238,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
     </Card>
   );
 
-  // Helper Component: Top Performers Card
+  // Helper Component: Top Performers Card (Department-Wise)
   const TopPerformersCard = () => (
     <Card>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
@@ -231,7 +246,12 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
           <div className="nf-avatar sm" style={{ background: "#E8A33D26", color: "#E8A33D" }}>
             <Trophy size={16} />
           </div>
-          <h3 className="nf-h3" style={{ margin: 0 }}>Top Performers</h3>
+          <div>
+            <h3 className="nf-h3" style={{ margin: 0 }}>Top Performers</h3>
+            <div style={{ fontSize: 11.5, color: "var(--ink-dim)", marginTop: 2 }}>
+              {userDept} Department
+            </div>
+          </div>
         </div>
       </div>
 
@@ -244,7 +264,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
           background: "linear-gradient(135deg, rgba(232,163,61,0.18), rgba(56,189,248,0.1))",
           border: "1px solid rgba(232,163,61,0.35)",
           borderRadius: 12,
-          marginBottom: 16,
+          marginBottom: 14,
         }}
       >
         <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -252,54 +272,92 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
             {employeeOfTheMonth.avatar}
           </div>
           <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#E8A33D", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-              🏆 Employee of the Month
+            <div style={{ fontSize: 10.5, fontWeight: 700, color: "#E8A33D", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              🏆 {userDept} Star Performer
             </div>
-            <div style={{ fontWeight: 700, fontSize: 15, marginTop: 2 }}>{employeeOfTheMonth.name}</div>
+            <div style={{ fontWeight: 700, fontSize: 14.5, marginTop: 2 }}>{employeeOfTheMonth.name}</div>
             <div style={{ fontSize: 11.5, color: "var(--ink-dim)" }}>{employeeOfTheMonth.role}</div>
           </div>
         </div>
         <div style={{ textAlign: "right" }}>
-          <div style={{ fontSize: 11, color: "var(--ink-dim)" }}>Performance</div>
+          <div style={{ fontSize: 11, color: "var(--ink-dim)" }}>Score</div>
           <div style={{ fontSize: 20, fontWeight: 700, color: "#E8A33D" }}>{employeeOfTheMonth.score}</div>
         </div>
       </div>
 
-      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-dim)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-        Top 5 Performers Ranking (Live Database)
+      {/* Logged in User Department Rank Banner */}
+      {userDeptRank && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "8px 12px",
+            background: "rgba(47,143,130,0.12)",
+            border: "1px solid #2F8F82",
+            borderRadius: 10,
+            marginBottom: 14,
+            fontSize: 12.5,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 600, color: "#2F8F82" }}>
+            <Award size={15} /> Your {userDept} Rank: <strong>#{userDeptRank}</strong>
+          </div>
+          <div style={{ fontWeight: 700, color: "#2F8F82" }}>Score: {userDeptScore}</div>
+        </div>
+      )}
+
+      <div style={{ fontSize: 11.5, fontWeight: 700, color: "var(--ink-dim)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+        Top 5 Performers in {userDept}
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {computedTopPerformers.map((p, idx) => (
-          <div
-            key={p.name + idx}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "8px 12px",
-              background: "var(--surface-alt)",
-              borderRadius: 9,
-              fontSize: 12.5,
-            }}
-          >
-            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-              <span className="nf-mono" style={{ fontWeight: 700, color: "var(--ink-dim)", width: 14 }}>
-                #{idx + 1}
+        {displayPerformers.map((p, idx) => {
+          const isCurrentUserRow = currentUser && (
+            (currentUser.name && p.name.toLowerCase() === currentUser.name.toLowerCase()) ||
+            (currentUser.email && p.email && p.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+            p.name === "Vanshika Tripathi"
+          );
+
+          return (
+            <div
+              key={p.name + idx}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "8px 12px",
+                background: isCurrentUserRow ? "rgba(47,143,130,0.14)" : "var(--surface-alt)",
+                border: isCurrentUserRow ? "1px solid #2F8F82" : "1px solid transparent",
+                borderRadius: 9,
+                fontSize: 12.5,
+              }}
+            >
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <span className="nf-mono" style={{ fontWeight: 700, color: "var(--ink-dim)", width: 14 }}>
+                  #{idx + 1}
+                </span>
+                <div className="nf-avatar sm" style={{ background: `${p.color}26`, color: p.color, fontWeight: 700 }}>
+                  {p.avatar}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
+                    {p.name}
+                    {isCurrentUserRow && (
+                      <span style={{ fontSize: 10, background: "#2F8F82", color: "#fff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>
+                        YOU (# {idx + 1})
+                      </span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--ink-dim)" }}>{p.role}</div>
+                </div>
+              </div>
+              <span className="nf-mono" style={{ fontWeight: 700, color: idx === 0 ? "#E8A33D" : "var(--accent-2)" }}>
+                {p.score}
               </span>
-              <div className="nf-avatar sm" style={{ background: `${p.color}26`, color: p.color, fontWeight: 700 }}>
-                {p.avatar}
-              </div>
-              <div>
-                <div style={{ fontWeight: 600 }}>{p.name}</div>
-                <div style={{ fontSize: 11, color: "var(--ink-dim)" }}>{p.role}</div>
-              </div>
             </div>
-            <span className="nf-mono" style={{ fontWeight: 700, color: idx === 0 ? "#E8A33D" : "var(--accent-2)" }}>
-              {p.score}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </Card>
   );

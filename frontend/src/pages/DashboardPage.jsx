@@ -384,7 +384,7 @@ export function DashboardPage({ role, onLogout }) {
 
   let pageContent = null;
   if (currentPage === "dashboard") {
-    pageContent = <DashboardModule role={role} employees={employeesList} leaveRequests={leaveRequests} goProfile={navigateToProfile} />;
+    pageContent = <DashboardModule role={role} employees={employeesList} leaveRequests={leaveRequests} goProfile={navigateToProfile} currentUser={loggedInUser} />;
   } else if (currentPage === "directory") {
     pageContent = (
       <DirectoryModule
