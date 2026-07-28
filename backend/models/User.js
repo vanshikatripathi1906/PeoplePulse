@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, default: "" },
     location: { type: String, default: "HQ" },
     type: { type: String, enum: ["Full-time", "Contract", "Part-time", "Intern"], default: "Full-time" },
-    status: { type: String, enum: ["Active", "On Leave", "Resigned"], default: "Active" },
+    status: { type: String, enum: ["Active", "Pending", "On Leave", "Resigned", "Rejected"], default: "Active" },
     joined: { type: String, default: "Jan 2024" },
     skills: [
       {

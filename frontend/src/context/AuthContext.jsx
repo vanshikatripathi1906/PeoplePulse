@@ -8,8 +8,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const savedToken = localStorage.getItem("token");
       const savedRole = localStorage.getItem("role");
+      const savedUser = localStorage.getItem("user_info");
       if (savedToken && savedRole) {
-        return {
+        return savedUser ? JSON.parse(savedUser) : {
           role: savedRole,
           name: savedRole === "Admin" ? "Aman Verma" : savedRole === "Manager" ? "Rahul Sharma" : "Vanshika Tripathi",
           token: savedToken,
@@ -26,22 +27,23 @@ export const AuthProvider = ({ children }) => {
     try {
       const data = await loginAPI({ role: selectedRole, ...credentials });
       const userObj = {
-        role: selectedRole,
-        name: data?.name || (selectedRole === "Admin" ? "Aman Verma" : selectedRole === "Manager" ? "Rahul Sharma" : "Vanshika Tripathi"),
-        token: data?.token || "demo-jwt-token",
+        role: data?.role || selectedRole,
+        name: data?.name || "Employee",
+        email: data?.email,
+        empId: data?.empId,
+        department: data?.department,
+        designation: data?.designation,
+        status: data?.status || "Active",
+        token: data?.token,
       };
       setUser(userObj);
       localStorage.setItem("token", userObj.token);
-      localStorage.setItem("role", selectedRole);
+      localStorage.setItem("role", userObj.role);
+      localStorage.setItem("user_info", JSON.stringify(userObj));
+      return userObj;
     } catch (err) {
-      const mockUser = {
-        role: selectedRole,
-        name: selectedRole === "Admin" ? "Aman Verma" : selectedRole === "Manager" ? "Rahul Sharma" : "Vanshika Tripathi",
-        token: "demo-jwt-token",
-      };
-      setUser(mockUser);
-      localStorage.setItem("token", mockUser.token);
-      localStorage.setItem("role", selectedRole);
+      // Throw error to block login if user is not authorized in MongoDB database
+      throw err;
     }
   };
 
@@ -49,6 +51,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+    localStorage.removeItem("user_info");
   };
 
   return (

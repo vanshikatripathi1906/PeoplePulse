@@ -1,9 +1,20 @@
 import React, { useState } from "react";
-import { Search, Filter, Plus, Edit3, Trash2, CheckCircle2 } from "lucide-react";
+import { Search, Filter, Plus, Edit3, Trash2, CheckCircle2, Check, X, Clock, UserCheck } from "lucide-react";
 import { EmployeeBadge } from "../common/EmployeeBadge";
 import { SectionTitle } from "../common/SectionTitle";
+import { Card } from "../common/Card";
 
-export function DirectoryModule({ role, employees, departments, goProfile, onAddEmployee, onDeleteEmployee }) {
+export function DirectoryModule({
+  role,
+  employees,
+  departments,
+  goProfile,
+  onAddEmployee,
+  onDeleteEmployee,
+  pendingUsers = [],
+  onApprovePending,
+  onRejectPending,
+}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDept, setSelectedDept] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
@@ -88,6 +99,73 @@ export function DirectoryModule({ role, employees, departments, goProfile, onAdd
         </div>
       )}
 
+      {/* Admin Pending Registration Approvals Section */}
+      {isManagerOrAdmin && pendingUsers && pendingUsers.length > 0 && (
+        <Card style={{ marginBottom: 24, border: "1px solid #E8A33D66", background: "rgba(232, 163, 61, 0.05)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <UserCheck size={18} style={{ color: "#E8A33D" }} />
+            <h3 className="nf-h3" style={{ margin: 0, fontSize: 16, color: "#E8A33D" }}>
+              Pending Registration Requests ({pendingUsers.length})
+            </h3>
+          </div>
+          <div style={{ fontSize: 12.5, color: "var(--ink-dim)", marginBottom: 14 }}>
+            The following prospective employees have submitted registration requests. Approving adds them to the MongoDB database and updates the active employee count in real-time.
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {pendingUsers.map((pu) => (
+              <div
+                key={pu._id || pu.empId}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "12px 16px",
+                  background: "var(--surface)",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)",
+                  flexWrap: "wrap",
+                  gap: 10,
+                }}
+              >
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 14.5 }}>{pu.name}</div>
+                  <div style={{ fontSize: 12, color: "var(--ink-dim)", marginTop: 2 }}>
+                    {pu.email} · {pu.designation} ({pu.department})
+                  </div>
+                </div>
+
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <button
+                    className="nf-btn primary sm"
+                    style={{ background: "#2F8F82", borderColor: "#2F8F82", color: "#fff", gap: 4 }}
+                    onClick={() => {
+                      if (onApprovePending) onApprovePending(pu);
+                      setNotification(`Approved employee ${pu.name}! Added to workforce database.`);
+                      setTimeout(() => setNotification(null), 3500);
+                    }}
+                  >
+                    <Check size={14} /> Approve Employee
+                  </button>
+
+                  <button
+                    className="nf-btn ghost sm danger"
+                    onClick={() => {
+                      if (onRejectPending) onRejectPending(pu._id || pu.id);
+                      setNotification(`Rejected registration request for ${pu.name}`);
+                      setTimeout(() => setNotification(null), 3000);
+                    }}
+                  >
+                    <X size={14} /> Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Add Employee Modal */}
       {showAddModal && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 460, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -126,6 +204,7 @@ export function DirectoryModule({ role, employees, departments, goProfile, onAdd
         </div>
       )}
 
+      {/* Filter and Search Controls */}
       <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
         <div className="nf-search" style={{ flex: 1, minWidth: 260 }}>
           <Search size={16} />
@@ -148,6 +227,7 @@ export function DirectoryModule({ role, employees, departments, goProfile, onAdd
         </select>
       </div>
 
+      {/* Employee Cards Grid */}
       <div className="nf-grid-3" style={{ gap: 24, marginTop: 24 }}>
         {filteredEmployees.map((emp) => (
           <div key={emp.id || emp.empId} style={{ position: "relative" }}>
@@ -155,9 +235,9 @@ export function DirectoryModule({ role, employees, departments, goProfile, onAdd
             {isManagerOrAdmin && (
               <button
                 className="nf-btn ghost sm danger"
-                title="Delete Employee"
-                style={{ position: "absolute", top: 12, right: 12, zIndex: 2, padding: "4px 8px" }}
-                onClick={(e) => { e.stopPropagation(); handleDelete(emp); }}
+                style={{ position: "absolute", top: 12, right: 12, padding: "4px 8px" }}
+                title="Delete Employee Record"
+                onClick={() => handleDelete(emp)}
               >
                 <Trash2 size={13} />
               </button>
@@ -165,12 +245,6 @@ export function DirectoryModule({ role, employees, departments, goProfile, onAdd
           </div>
         ))}
       </div>
-
-      {filteredEmployees.length === 0 && (
-        <div className="nf-empty" style={{ marginTop: 30 }}>
-          No employees found matching "{searchQuery}".
-        </div>
-      )}
     </>
   );
 }

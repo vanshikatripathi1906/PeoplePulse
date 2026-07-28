@@ -17,6 +17,26 @@ export const loginAPI = async (credentials) => {
   return response.data;
 };
 
+export const registerUserAPI = async (userData) => {
+  const response = await API.post("/auth/register", userData);
+  return response.data;
+};
+
+export const fetchPendingUsersAPI = async () => {
+  const response = await API.get("/auth/pending");
+  return response.data;
+};
+
+export const approveUserAPI = async (id) => {
+  const response = await API.patch(`/auth/approve/${id}`);
+  return response.data;
+};
+
+export const rejectUserAPI = async (id) => {
+  const response = await API.patch(`/auth/reject/${id}`);
+  return response.data;
+};
+
 export const fetchEmployeesAPI = async (params) => {
   const response = await API.get("/employees", { params });
   return response.data;

@@ -16,6 +16,7 @@ import { NotificationsModule } from "../components/modules/NotificationsModule";
 import { AIResumeSearchModule } from "../components/modules/AIResumeSearchModule";
 import { AssetsModule } from "../components/modules/AssetsModule";
 import { MeetingRoomsModule } from "../components/modules/MeetingRoomsModule";
+import { fetchPendingUsersAPI, approveUserAPI, rejectUserAPI } from "../services/api";
 
 function generateMockAttendance(seedNumber) {
   const attendanceList = [];
@@ -102,6 +103,7 @@ const DEPARTMENTS_DATA = [
 
 export function DashboardPage({ role, onLogout }) {
   const [currentPage, setCurrentPage] = useState("dashboard");
+  const [pendingUsers, setPendingUsers] = useState([]);
 
   const [employeesList, setEmployeesList] = useState(() => {
     const saved = localStorage.getItem("peoplepulse_employees");
@@ -110,15 +112,95 @@ export function DashboardPage({ role, onLogout }) {
       if (parsed && Array.isArray(parsed) && parsed.length >= 25) {
         return parsed;
       }
-    } catch (e) {
-      console.error("Failed to parse local employee storage", e);
-    }
+    } catch (e) {}
     return INITIAL_EMPLOYEES_DATA;
   });
 
   useEffect(() => {
     localStorage.setItem("peoplepulse_employees", JSON.stringify(employeesList));
   }, [employeesList]);
+
+  // Load pending employee access requests from backend MongoDB
+  useEffect(() => {
+    const loadPending = async () => {
+      try {
+        const data = await fetchPendingUsersAPI();
+        if (data && Array.isArray(data)) {
+          setPendingUsers(data);
+        }
+      } catch (e) {
+        // Fallback local pending users
+        try {
+          const localPending = localStorage.getItem("peoplepulse_pending_users");
+          if (localPending) setPendingUsers(JSON.parse(localPending));
+        } catch (err) {}
+      }
+    };
+    loadPending();
+  }, []);
+
+  const handleApprovePendingUser = async (user) => {
+    const targetId = user._id || user.id;
+    try {
+      await approveUserAPI(targetId);
+    } catch (e) {}
+
+    // Add approved user to active workforce
+    const newEmp = {
+      id: Date.now(),
+      empId: user.empId || `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
+      name: user.name,
+      designation: user.designation || "Software Associate",
+      department: user.department || "Engineering",
+      experience: "1 Year",
+      manager: "Aman Verma",
+      email: user.email,
+      phone: "+91 98111 22334",
+      location: "Indore HQ",
+      type: "Full-time",
+      status: "Active",
+      joined: "Jul 2026",
+      initials: user.name.split(" ").map((w) => w[0]).slice(0, 2).join(""),
+      attendance: Array(28).fill("P"),
+      skills: [{ name: "React", level: 3 }, { name: "Communication", level: 4 }],
+      documents: ["Resume", "Offer Letter"],
+      perf: { Technical: 8, Communication: 8, Leadership: 7, "Problem Solving": 8, Teamwork: 8 },
+      salary: { gross: 60000, tax: 6000, pf: 2400, bonus: 2000, net: 53600 },
+    };
+
+    const updatedList = [newEmp, ...employeesList];
+    setEmployeesList(updatedList);
+    setPendingUsers(pendingUsers.filter((p) => (p._id || p.id) !== targetId));
+
+    try {
+      const savedMetrics = localStorage.getItem("peoplepulse_dashboard_metrics");
+      const currentMetrics = savedMetrics ? JSON.parse(savedMetrics) : {};
+      const newMetrics = {
+        ...currentMetrics,
+        totalEmployees: updatedList.length,
+        employeesPresent: Math.round(updatedList.length * 0.89),
+      };
+      localStorage.setItem("peoplepulse_dashboard_metrics", JSON.stringify(newMetrics));
+
+      const savedNotifs = localStorage.getItem("peoplepulse_notifications");
+      const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];
+      const newNotif = {
+        id: Date.now(),
+        title: "Employee Registration Approved",
+        message: `${newEmp.name} (${newEmp.designation}) has been approved and added to active employees as ${newEmp.empId}.`,
+        time: "Just now",
+        unread: true,
+      };
+      localStorage.setItem("peoplepulse_notifications", JSON.stringify([newNotif, ...currentNotifs]));
+    } catch (e) {}
+  };
+
+  const handleRejectPendingUser = async (userId) => {
+    try {
+      await rejectUserAPI(userId);
+    } catch (e) {}
+    setPendingUsers(pendingUsers.filter((p) => (p._id || p.id) !== userId));
+  };
 
   const [selectedEmployee, setSelectedEmployee] = useState(() => (employeesList && employeesList.length > 0 ? employeesList[1] || employeesList[0] : INITIAL_EMPLOYEES_DATA[0]));
 
@@ -278,6 +360,9 @@ export function DashboardPage({ role, onLogout }) {
         goProfile={navigateToProfile}
         onAddEmployee={handleAddEmployee}
         onDeleteEmployee={handleDeleteEmployee}
+        pendingUsers={pendingUsers}
+        onApprovePending={handleApprovePendingUser}
+        onRejectPending={handleRejectPendingUser}
       />
     );
   } else if (currentPage === "empProfile") {

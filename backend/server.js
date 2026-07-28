@@ -2,7 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
-const { EMPLOYEES_SEED, DEPARTMENTS_SEED, LEAVES_SEED, TASKS_SEED } = require("./utils/seedData");
+const User = require("./models/User");
+const { EMPLOYEES_SEED } = require("./utils/seedData");
 
 dotenv.config();
 
@@ -11,7 +12,18 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-connectDB();
+connectDB().then(async () => {
+  try {
+    const userCount = await User.countDocuments({});
+    if (userCount === 0) {
+      console.log("Database empty. Seeding initial employee records into MongoDB...");
+      await User.insertMany(EMPLOYEES_SEED);
+      console.log(`Seeded ${EMPLOYEES_SEED.length} employees into MongoDB.`);
+    }
+  } catch (err) {
+    console.log("Could not auto-seed DB:", err.message);
+  }
+});
 
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/employees", require("./routes/employeeRoutes"));
