@@ -1,7 +1,7 @@
 import React from "react";
 import {
   LayoutDashboard, Users, Clock, CalendarDays, Building2, ListChecks, Star,
-  Network, Wallet, BarChart3, Bell, LogOut, User, Sparkles, Laptop, DoorOpen
+  Network, Wallet, Bell, LogOut, User, Sparkles, Laptop, DoorOpen
 } from "lucide-react";
 
 export const NAV_ITEMS = [
@@ -13,12 +13,11 @@ export const NAV_ITEMS = [
   { key: "departments", label: "Departments", icon: Building2, roles: ["Admin", "Manager"] },
   { key: "tasks", label: "Tasks", icon: ListChecks, roles: ["Admin", "Manager", "Employee"] },
   { key: "performance", label: "Performance", icon: Star, roles: ["Admin", "Manager", "Employee"] },
-  { key: "aisearch", label: "Skill Search", icon: Sparkles, roles: ["Admin", "Manager"] },
+  { key: "aisearch", label: "Skill Search", icon: Sparkles, roles: ["Manager"] },
   { key: "assets", label: "Assets", icon: Laptop, roles: ["Admin"] },
   { key: "rooms", label: "Meeting Rooms", icon: DoorOpen, roles: ["Admin"] },
   { key: "orgchart", label: "Org Chart", icon: Network, roles: ["Admin", "Manager"] },
-  { key: "payroll", label: "Payroll", icon: Wallet, roles: ["Admin", "Manager", "Employee"] },
-  { key: "analytics", label: "Analytics", icon: BarChart3, roles: ["Admin", "Manager"] },
+  { key: "payroll", label: "Payroll", icon: Wallet, roles: ["Manager", "Employee"] },
   { key: "notifications", label: "Notifications", icon: Bell, roles: ["Admin", "Manager", "Employee"] },
 ];
 
