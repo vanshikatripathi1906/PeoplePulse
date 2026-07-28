@@ -382,6 +382,14 @@ export function DashboardPage({ role, onLogout }) {
     } catch (e) {}
   };
 
+  const handleDeleteLeaveRequest = (id) => {
+    const updated = leaveRequests.filter((x) => x.id !== id);
+    setLeaveRequests(updated);
+    try {
+      localStorage.setItem("peoplepulse_leave_requests", JSON.stringify(updated));
+    } catch (e) {}
+  };
+
   let pageContent = null;
   if (currentPage === "dashboard") {
     pageContent = <DashboardModule role={role} employees={employeesList} leaveRequests={leaveRequests} goProfile={navigateToProfile} currentUser={loggedInUser} />;
@@ -406,7 +414,7 @@ export function DashboardPage({ role, onLogout }) {
   } else if (currentPage === "attendance") {
     pageContent = <AttendanceModule role={role} employees={employeesList} />;
   } else if (currentPage === "leave") {
-    pageContent = <LeaveModule role={role} leaveRequests={leaveRequests} onUpdateStatus={handleUpdateLeaveStatus} onApplyLeave={handleApplyLeave} currentUser={loggedInUser} />;
+    pageContent = <LeaveModule role={role} leaveRequests={leaveRequests} onUpdateStatus={handleUpdateLeaveStatus} onApplyLeave={handleApplyLeave} onDeleteLeave={handleDeleteLeaveRequest} currentUser={loggedInUser} />;
   } else if (currentPage === "departments") {
     pageContent = <DepartmentsModule role={role} departments={DEPARTMENTS_DATA} currentUser={loggedInUser} />;
   } else if (currentPage === "tasks") {

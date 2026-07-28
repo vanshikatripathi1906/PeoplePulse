@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Check, X } from "lucide-react";
+import { Check, X, Trash2, CheckCircle2 } from "lucide-react";
 import { Card } from "../common/Card";
 import { SectionTitle } from "../common/SectionTitle";
 import { Pill } from "../common/Pill";
@@ -12,8 +12,9 @@ const LEAVE_REQUESTS_DEFAULT = [
   { id: "l4", employee: "Zara Ahmed", type: "Casual", days: 2, start: "22 Jul", end: "23 Jul", reason: "Home relocation", status: "Approved" },
 ];
 
-export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave, currentUser }) {
+export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave, onDeleteLeave, currentUser }) {
   const allReqs = leaveRequests || LEAVE_REQUESTS_DEFAULT;
+  const [notification, setNotification] = useState(null);
 
   // Filter requests for Employee role: show ONLY requests filed by the logged-in employee
   const reqs = role === "Employee" && currentUser?.name
@@ -29,6 +30,14 @@ export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave,
     if (onUpdateStatus) {
       onUpdateStatus(id, status);
     }
+  };
+
+  const handleDelete = (id) => {
+    if (onDeleteLeave) {
+      onDeleteLeave(id);
+    }
+    setNotification("Leave request deleted successfully.");
+    setTimeout(() => setNotification(null), 3000);
   };
 
   const handleApply = async (e) => {
@@ -50,11 +59,20 @@ export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave,
       onApplyLeave(newReq);
     }
     setForm({ type: "Casual", start: "", end: "", reason: "" });
+    setNotification("Leave request submitted successfully!");
+    setTimeout(() => setNotification(null), 3000);
   };
 
   return (
     <>
       <SectionTitle title="Leave management" />
+
+      {notification && (
+        <div style={{ background: "#2F8F8222", border: "1px solid #2F8F82", padding: "10px 16px", borderRadius: 10, color: "#2F8F82", fontSize: 13, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+          <CheckCircle2 size={16} /> {notification}
+        </div>
+      )}
+
       <div className="nf-grid-2">
         {(role === "Employee" || role === "Manager" || role === "Admin") && (
           <Card>
@@ -78,20 +96,32 @@ export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave,
           <h3 className="nf-h3">Requests {role !== "Employee" ? "for your team" : "you've filed"}</h3>
           <div className="nf-leavelist">
             {reqs.map((r) => (
-              <div key={r.id} className="nf-leave-item">
+              <div key={r.id} className="nf-leave-item" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 13.5 }}>{r.employee}</div>
                   <div style={{ fontSize: 12, color: "var(--ink-dim)" }}>{r.type} · {r.days} day{r.days > 1 ? "s" : ""} · {r.start}–{r.end}</div>
                   <div style={{ fontSize: 12, color: "var(--ink-dim)" }}>{r.reason}</div>
                 </div>
-                {r.status === "Pending" && role !== "Employee" ? (
-                  <div style={{ display: "flex", gap: 6 }}>
-                    <button className="nf-btn ghost sm" title="Approve Leave" onClick={() => act(r.id, "Approved")}><Check size={13} /></button>
-                    <button className="nf-btn ghost sm danger" title="Reject Leave" onClick={() => act(r.id, "Rejected")}><X size={13} /></button>
-                  </div>
-                ) : (
-                  <Pill tone={r.status === "Approved" ? "good" : r.status === "Rejected" ? "bad" : "warn"}>{r.status}</Pill>
-                )}
+
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {r.status === "Pending" && role !== "Employee" ? (
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button className="nf-btn ghost sm" title="Approve Leave" onClick={() => act(r.id, "Approved")}><Check size={13} /></button>
+                      <button className="nf-btn ghost sm danger" title="Reject Leave" onClick={() => act(r.id, "Rejected")}><X size={13} /></button>
+                    </div>
+                  ) : (
+                    <Pill tone={r.status === "Approved" ? "good" : r.status === "Rejected" ? "bad" : "warn"}>{r.status}</Pill>
+                  )}
+
+                  <button
+                    className="nf-btn ghost sm danger"
+                    title="Delete Leave Request"
+                    style={{ padding: "5px 8px" }}
+                    onClick={() => handleDelete(r.id)}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               </div>
             ))}
             {reqs.length === 0 && (
