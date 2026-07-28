@@ -16,7 +16,7 @@ import { NotificationsModule } from "../components/modules/NotificationsModule";
 import { AIResumeSearchModule } from "../components/modules/AIResumeSearchModule";
 import { AssetsModule } from "../components/modules/AssetsModule";
 import { MeetingRoomsModule } from "../components/modules/MeetingRoomsModule";
-import { fetchPendingUsersAPI, approveUserAPI, rejectUserAPI } from "../services/api";
+import { fetchEmployeesAPI, fetchPendingUsersAPI, approveUserAPI, rejectUserAPI } from "../services/api";
 
 function generateMockAttendance(seedNumber) {
   const attendanceList = [];
@@ -40,29 +40,14 @@ function generateMockAttendance(seedNumber) {
 const INITIAL_EMPLOYEES_DATA = [
   { id: 1, empId: "EMP-1001", name: "Aman Verma", designation: "Engineering Head", department: "Engineering", experience: "9 Years", manager: "—", status: "Active", email: "aman.verma@peoplepulse.co", phone: "+91 98200 11234", location: "Indore HQ", type: "Full-time", joined: "Jan 2018" },
   { id: 2, empId: "EMP-1002", name: "Rahul Sharma", designation: "Senior Engineering Manager", department: "Engineering", experience: "8 Years", manager: "Aman Verma", status: "Active", email: "rahul.sharma@peoplepulse.co", phone: "+91 99770 44120", location: "Indore HQ", type: "Full-time", joined: "Jul 2020" },
-  { id: 3, empId: "EMP-1003", name: "Priya Nair", designation: "Product Manager", department: "Product", experience: "7 Years", manager: "Aman Verma", status: "Active", email: "priya.nair@peoplepulse.co", phone: "+91 96541 22310", location: "Indore HQ", type: "Full-time", joined: "Apr 2017" },
+  { id: 3, empId: "EMP-1003", name: "Priya Nair", designation: "Product Head", department: "Product", experience: "7 Years", manager: "Aman Verma", status: "Active", email: "priya.nair@peoplepulse.co", phone: "+91 96541 22310", location: "Indore HQ", type: "Full-time", joined: "Apr 2017" },
   { id: 4, empId: "EMP-1004", name: "Vanshika Tripathi", designation: "Frontend Developer", department: "Engineering", experience: "2 Years", manager: "Rahul Sharma", status: "Active", email: "vanshika.t@peoplepulse.co", phone: "+91 90212 55810", location: "Indore HQ", type: "Full-time", joined: "Mar 2024" },
   { id: 5, empId: "EMP-1005", name: "Aditi Tripathi", designation: "Backend Developer", department: "Engineering", experience: "5 Years", manager: "Rahul Sharma", status: "Active", email: "aditi.t@peoplepulse.co", phone: "+91 98330 93380", location: "Indore HQ", type: "Full-time", joined: "Jan 2021" },
   { id: 6, empId: "EMP-1006", name: "Rohan Gupta", designation: "Full Stack Developer", department: "Engineering", experience: "4 Years", manager: "Rahul Sharma", status: "Active", email: "rohan.gupta@peoplepulse.co", phone: "+91 98210 44321", location: "Pune Office", type: "Full-time", joined: "Aug 2022" },
   { id: 7, empId: "EMP-1007", name: "Neha Singh", designation: "UI/UX Designer", department: "Design", experience: "3 Years", manager: "Priya Nair", status: "Active", email: "neha.singh@peoplepulse.co", phone: "+91 97110 55432", location: "Remote", type: "Full-time", joined: "May 2023" },
-  { id: 8, empId: "EMP-1008", name: "Karan Malhotra", designation: "QA Engineer", department: "Engineering", experience: "3 Years", manager: "Rahul Sharma", status: "Active", email: "karan.m@peoplepulse.co", phone: "+91 97531 88120", location: "Pune Office", type: "Contract", joined: "Feb 2023" },
-  { id: 9, empId: "EMP-1009", name: "Sneha Patel", designation: "DevOps Engineer", department: "Engineering", experience: "5 Years", manager: "Rahul Sharma", status: "Active", email: "sneha.patel@peoplepulse.co", phone: "+91 98450 11982", location: "Indore HQ", type: "Full-time", joined: "Oct 2021" },
-  { id: 10, empId: "EMP-1010", name: "Arjun Mehta", designation: "Data Analyst", department: "Analytics", experience: "4 Years", manager: "Priya Nair", status: "Active", email: "arjun.mehta@peoplepulse.co", phone: "+91 98760 33412", location: "Indore HQ", type: "Full-time", joined: "Nov 2022" },
-  { id: 11, empId: "EMP-1011", name: "Pooja Joshi", designation: "HR Manager", department: "Human Resources", experience: "8 Years", manager: "Aman Verma", status: "Active", email: "pooja.joshi@peoplepulse.co", phone: "+91 99110 22345", location: "Indore HQ", type: "Full-time", joined: "Jun 2018" },
-  { id: 12, empId: "EMP-1012", name: "Nikhil Jain", designation: "Talent Acquisition Specialist", department: "Human Resources", experience: "3 Years", manager: "Pooja Joshi", status: "Active", email: "nikhil.jain@peoplepulse.co", phone: "+91 98230 44567", location: "Indore HQ", type: "Full-time", joined: "Mar 2023" },
-  { id: 13, empId: "EMP-1013", name: "Meera Iyer", designation: "Finance Manager", department: "Finance", experience: "9 Years", manager: "Aman Verma", status: "Active", email: "meera.iyer@peoplepulse.co", phone: "+91 97340 55678", location: "Indore HQ", type: "Full-time", joined: "Jan 2017" },
-  { id: 14, empId: "EMP-1014", name: "Siddharth Kapoor", designation: "Accountant", department: "Finance", experience: "4 Years", manager: "Meera Iyer", status: "Active", email: "siddharth.k@peoplepulse.co", phone: "+91 98450 66789", location: "Indore HQ", type: "Full-time", joined: "Apr 2022" },
-  { id: 15, empId: "EMP-1015", name: "Anjali Deshmukh", designation: "Marketing Manager", department: "Marketing", experience: "6 Years", manager: "Aman Verma", status: "Active", email: "anjali.d@peoplepulse.co", phone: "+91 99560 77890", location: "Indore HQ", type: "Full-time", joined: "Sep 2020" },
-  { id: 16, empId: "EMP-1016", name: "Vivek Mishra", designation: "Digital Marketing Executive", department: "Marketing", experience: "2 Years", manager: "Anjali Deshmukh", status: "Active", email: "vivek.mishra@peoplepulse.co", phone: "+91 98670 88901", location: "Remote", type: "Full-time", joined: "Feb 2024" },
-  { id: 17, empId: "EMP-1017", name: "Ishita Roy", designation: "Business Analyst", department: "Product", experience: "3 Years", manager: "Priya Nair", status: "Active", email: "ishita.roy@peoplepulse.co", phone: "+91 97780 99012", location: "Indore HQ", type: "Full-time", joined: "Jul 2023" },
-  { id: 18, empId: "EMP-1018", name: "Harsh Agrawal", designation: "Mobile App Developer", department: "Engineering", experience: "4 Years", manager: "Rahul Sharma", status: "Active", email: "harsh.a@peoplepulse.co", phone: "+91 98890 10123", location: "Pune Office", type: "Full-time", joined: "Nov 2022" },
-  { id: 19, empId: "EMP-1019", name: "Kavya Reddy", designation: "React Developer", department: "Engineering", experience: "2 Years", manager: "Rahul Sharma", status: "Active", email: "kavya.reddy@peoplepulse.co", phone: "+91 99901 21234", location: "Indore HQ", type: "Full-time", joined: "Jan 2024" },
-  { id: 20, empId: "EMP-1020", name: "Deepak Yadav", designation: "Node.js Developer", department: "Engineering", experience: "5 Years", manager: "Rahul Sharma", status: "Active", email: "deepak.yadav@peoplepulse.co", phone: "+91 98012 32345", location: "Indore HQ", type: "Full-time", joined: "Aug 2021" },
-  { id: 21, empId: "EMP-1021", name: "Ritika Bansal", designation: "Customer Success Manager", department: "Customer Success", experience: "6 Years", manager: "Aman Verma", status: "Active", email: "ritika.b@peoplepulse.co", phone: "+91 97123 43456", location: "Indore HQ", type: "Full-time", joined: "May 2020" },
-  { id: 22, empId: "EMP-1022", name: "Abhishek Tiwari", designation: "Support Engineer", department: "Customer Success", experience: "2 Years", manager: "Ritika Bansal", status: "Active", email: "abhishek.t@peoplepulse.co", phone: "+91 98234 54567", location: "Remote", type: "Full-time", joined: "Mar 2024" },
-  { id: 23, empId: "EMP-1023", name: "Tanvi Kulkarni", designation: "Data Scientist", department: "Analytics", experience: "5 Years", manager: "Priya Nair", status: "Active", email: "tanvi.k@peoplepulse.co", phone: "+91 99345 65678", location: "Indore HQ", type: "Full-time", joined: "Oct 2021" },
-  { id: 24, empId: "EMP-1024", name: "Mohit Saxena", designation: "Cybersecurity Engineer", department: "Engineering", experience: "6 Years", manager: "Rahul Sharma", status: "Active", email: "mohit.saxena@peoplepulse.co", phone: "+91 98456 76789", location: "Indore HQ", type: "Full-time", joined: "Dec 2020" },
-  { id: 25, empId: "EMP-1025", name: "Shreya Ghosh", designation: "Software Engineer", department: "Engineering", experience: "1 Year", manager: "Rahul Sharma", status: "Active", email: "shreya.ghosh@peoplepulse.co", phone: "+91 97567 87890", location: "Indore HQ", type: "Full-time", joined: "Jun 2025" },
+  { id: 8, empId: "EMP-1008", name: "Karan Malhotra", designation: "QA Lead", department: "Engineering", experience: "3.5 Years", manager: "Rahul Sharma", status: "Active", email: "karan.m@peoplepulse.co", phone: "+91 97531 88120", location: "Pune Office", type: "Contract", joined: "Feb 2023" },
+  { id: 9, empId: "EMP-1009", name: "Sneha Patel", designation: "DevOps Specialist", department: "Engineering", experience: "5 Years", manager: "Rahul Sharma", status: "Active", email: "sneha.patel@peoplepulse.co", phone: "+91 98450 11982", location: "Indore HQ", type: "Full-time", joined: "Oct 2021" },
+  { id: 10, empId: "EMP-1010", name: "Arjun Mehta", designation: "Data Analytics Engineer", department: "Analytics", experience: "4 Years", manager: "Priya Nair", status: "Active", email: "arjun.mehta@peoplepulse.co", phone: "+91 98760 33412", location: "Indore HQ", type: "Full-time", joined: "Nov 2022" },
 ];
 
 INITIAL_EMPLOYEES_DATA.forEach((employee, index) => {
@@ -104,23 +89,38 @@ const DEPARTMENTS_DATA = [
 export function DashboardPage({ role, onLogout }) {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [pendingUsers, setPendingUsers] = useState([]);
+  const [employeesList, setEmployeesList] = useState(INITIAL_EMPLOYEES_DATA);
 
-  const [employeesList, setEmployeesList] = useState(() => {
-    const saved = localStorage.getItem("peoplepulse_employees");
-    try {
-      const parsed = saved ? JSON.parse(saved) : null;
-      if (parsed && Array.isArray(parsed) && parsed.length >= 25) {
-        return parsed;
-      }
-    } catch (e) {}
-    return INITIAL_EMPLOYEES_DATA;
-  });
-
+  // Synchronize live employee data directly from backend MongoDB Atlas database
   useEffect(() => {
-    localStorage.setItem("peoplepulse_employees", JSON.stringify(employeesList));
-  }, [employeesList]);
+    const loadDBEmployees = async () => {
+      try {
+        const dbData = await fetchEmployeesAPI();
+        if (dbData && Array.isArray(dbData) && dbData.length > 0) {
+          const formattedDBList = dbData.map((emp, index) => ({
+            ...emp,
+            id: emp._id || emp.id || index + 1,
+            initials: emp.name ? emp.name.split(" ").map((w) => w[0]).slice(0, 2).join("") : "EM",
+            attendance: emp.attendance && emp.attendance.length >= 28 ? emp.attendance : generateMockAttendance(index + 1),
+            skills: emp.skills && emp.skills.length > 0 ? emp.skills : [
+              { name: "React", level: 4 },
+              { name: "Node.js", level: 3 },
+              { name: "MongoDB", level: 3 },
+            ],
+            perf: emp.perf || { Technical: 8, Communication: 8, Leadership: 7, "Problem Solving": 8, Teamwork: 9 },
+            salary: emp.salary || { gross: 60000, tax: 6000, pf: 2400, bonus: 2000, net: 53600 },
+          }));
+          setEmployeesList(formattedDBList);
+          localStorage.setItem("peoplepulse_employees", JSON.stringify(formattedDBList));
+        }
+      } catch (err) {
+        console.log("Using cached employee list:", err);
+      }
+    };
+    loadDBEmployees();
+  }, []);
 
-  // Load pending employee access requests from backend MongoDB
+  // Synchronize pending employee access requests from backend MongoDB
   useEffect(() => {
     const loadPending = async () => {
       try {
@@ -128,13 +128,7 @@ export function DashboardPage({ role, onLogout }) {
         if (data && Array.isArray(data)) {
           setPendingUsers(data);
         }
-      } catch (e) {
-        // Fallback local pending users
-        try {
-          const localPending = localStorage.getItem("peoplepulse_pending_users");
-          if (localPending) setPendingUsers(JSON.parse(localPending));
-        } catch (err) {}
-      }
+      } catch (e) {}
     };
     loadPending();
   }, []);
@@ -145,9 +139,8 @@ export function DashboardPage({ role, onLogout }) {
       await approveUserAPI(targetId);
     } catch (e) {}
 
-    // Add approved user to active workforce
     const newEmp = {
-      id: Date.now(),
+      id: user._id || Date.now(),
       empId: user.empId || `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
       name: user.name,
       designation: user.designation || "Software Associate",
