@@ -43,7 +43,7 @@ export function TasksModule({ role, employees = [], currentUser }) {
 
   // Filter employees for Manager: show department employees
   const assignableEmployees = role === "Manager" && currentUser?.department
-    ? employees.filter((e) => e.department.toLowerCase() === currentUser.department.toLowerCase())
+    ? employees.filter((e) => e.department?.toLowerCase() === currentUser.department?.toLowerCase())
     : employees;
 
   const [addForm, setAddForm] = useState({
@@ -65,15 +65,17 @@ export function TasksModule({ role, employees = [], currentUser }) {
 
   const cols = Object.keys(board);
 
-  // Scoped board for Employee role: show ONLY tasks assigned to logged-in employee
+  // Scoped board for Employee role: show ONLY tasks assigned to the logged-in employee
   const displayBoard = {};
+  const currentEmpName = (currentUser?.name || "Vanshika Tripathi").toLowerCase();
+
   cols.forEach((col) => {
-    if (isEmployee && currentUser?.name) {
-      displayBoard[col] = board[col].filter(
-        (t) => t.assignee.toLowerCase() === currentUser.name.toLowerCase() || t.assignee === "Vanshika Tripathi"
+    if (isEmployee) {
+      displayBoard[col] = (board[col] || []).filter(
+        (t) => (t.assignee || "").toLowerCase() === currentEmpName
       );
     } else {
-      displayBoard[col] = board[col];
+      displayBoard[col] = board[col] || [];
     }
   });
 

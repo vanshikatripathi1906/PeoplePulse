@@ -205,11 +205,27 @@ export function DashboardPage({ role, onLogout }) {
 
   const [selectedEmployee, setSelectedEmployee] = useState(() => (employeesList && employeesList.length > 0 ? employeesList[1] || employeesList[0] : INITIAL_EMPLOYEES_DATA[0]));
 
-  let loggedInUser = (employeesList && employeesList.length > 0 ? employeesList[1] || employeesList[0] : INITIAL_EMPLOYEES_DATA[0]);
-  if (role === "Admin") {
-    loggedInUser = (employeesList && employeesList.length > 0 ? employeesList[0] : INITIAL_EMPLOYEES_DATA[0]);
-  } else if (role === "Manager") {
-    loggedInUser = (employeesList && employeesList.length > 0 ? employeesList[1] || employeesList[0] : INITIAL_EMPLOYEES_DATA[0]);
+  const authUserInfo = (() => {
+    try {
+      const u = localStorage.getItem("user_info");
+      return u ? JSON.parse(u) : null;
+    } catch (e) {
+      return null;
+    }
+  })();
+
+  let loggedInUser = employeesList.find(
+    (e) => e.email?.toLowerCase() === authUserInfo?.email?.toLowerCase() || e.name?.toLowerCase() === authUserInfo?.name?.toLowerCase()
+  );
+
+  if (!loggedInUser) {
+    if (role === "Admin") {
+      loggedInUser = employeesList.find((e) => e.role === "Admin") || employeesList[0] || INITIAL_EMPLOYEES_DATA[0];
+    } else if (role === "Manager") {
+      loggedInUser = employeesList.find((e) => e.role === "Manager") || employeesList[1] || INITIAL_EMPLOYEES_DATA[1];
+    } else {
+      loggedInUser = employeesList.find((e) => e.name === "Vanshika Tripathi" || e.email === "vanshikapeoplepulse@gmail.com") || employeesList[3] || INITIAL_EMPLOYEES_DATA[3];
+    }
   }
 
   const navigateToProfile = (targetEmployee) => {
