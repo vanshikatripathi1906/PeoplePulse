@@ -11,14 +11,15 @@ const loginUser = async (req, res) => {
   const { email, password, role } = req.body;
 
   try {
-    let user = await User.findOne({ email });
+    const searchEmail = (email || "").trim().toLowerCase();
+    let user = await User.findOne({ email: new RegExp(`^${searchEmail}$`, "i") });
 
     if (!user && role) {
       user = await User.findOne({ role });
     }
 
     if (!user) {
-      return res.status(401).json({ message: "Account not found. Please submit an access request to register." });
+      return res.status(401).json({ message: "Account not found. Invalid email or password." });
     }
 
     if (user.status === "Pending") {
@@ -33,9 +34,17 @@ const loginUser = async (req, res) => {
       return res.status(403).json({ message: "This employee account is inactive." });
     }
 
-    const isMatch = await user.matchPassword(password || "password123");
-    if (isMatch || password === "password123") {
-      res.json({
+    let isMatch = false;
+    try {
+      isMatch = await user.matchPassword(password);
+    } catch (e) {}
+
+    if (!isMatch && user.password === password) {
+      isMatch = true;
+    }
+
+    if (isMatch) {
+      return res.json({
         _id: user._id,
         empId: user.empId,
         name: user.name,
@@ -46,9 +55,9 @@ const loginUser = async (req, res) => {
         status: user.status,
         token: generateToken(user._id),
       });
-    } else {
-      res.status(401).json({ message: "Invalid email or password" });
     }
+
+    return res.status(401).json({ message: "Invalid email or password" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -58,7 +67,7 @@ const registerUser = async (req, res) => {
   const { name, email, password, designation, department, role } = req.body;
 
   try {
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ email: new RegExp(`^${email.trim()}$`, "i") });
     if (userExists) {
       return res.status(400).json({ message: "An account with this email address already exists." });
     }
@@ -69,7 +78,7 @@ const registerUser = async (req, res) => {
     const user = await User.create({
       empId,
       name,
-      email,
+      email: email.trim().toLowerCase(),
       password: password || "password123",
       role: role || "Employee",
       designation: designation || "Software Developer",
