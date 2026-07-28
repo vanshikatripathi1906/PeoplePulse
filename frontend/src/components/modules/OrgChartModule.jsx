@@ -15,7 +15,7 @@ const INITIAL_NODES = [
   { id: "8", name: "Vanshika Tripathi", role: "Frontend Developer", department: "Engineering", reportsTo: "Rahul Sharma" },
   { id: "9", name: "Aditi Tripathi", role: "Backend Developer", department: "Engineering", reportsTo: "Rahul Sharma" },
   { id: "10", name: "Rohan Gupta", role: "Full Stack Developer", department: "Engineering", reportsTo: "Rahul Sharma" },
-  { id: "11", name: "Karan Malhotra", role: "QA Engineer", department: "Engineering", reportsTo: "Rahul Sharma" },
+  { id: "11", name: "Karan Malhotra", role: "QA Lead", department: "Engineering", reportsTo: "Rahul Sharma" },
   { id: "12", name: "Sneha Patel", role: "DevOps Engineer", department: "Engineering", reportsTo: "Rahul Sharma" },
   { id: "13", name: "Harsh Agrawal", role: "Mobile App Developer", department: "Engineering", reportsTo: "Rahul Sharma" },
   { id: "14", name: "Kavya Reddy", role: "React Developer", department: "Engineering", reportsTo: "Rahul Sharma" },
@@ -32,21 +32,29 @@ const INITIAL_NODES = [
   { id: "25", name: "Abhishek Tiwari", role: "Support Engineer", department: "Customer Success", reportsTo: "Ritika Bansal" },
 ];
 
-export function OrgChartModule({ role }) {
-  const [nodes, setNodes] = useState(() => {
-    try {
-      const saved = localStorage.getItem("peoplepulse_org_nodes");
-      const parsed = saved ? JSON.parse(saved) : null;
-      if (parsed && Array.isArray(parsed) && parsed.length >= 25) {
-        return parsed;
-      }
-    } catch (e) {}
-    return INITIAL_NODES;
-  });
-
-  useEffect(() => {
-    localStorage.setItem("peoplepulse_org_nodes", JSON.stringify(nodes));
-  }, [nodes]);
+export function OrgChartModule({ role, employees = [] }) {
+  // Dynamically map nodes from live populated MongoDB Atlas database
+  const activeNodes = (employees && employees.length > 0)
+    ? employees.map((emp) => {
+        const roleStr = emp.designation || emp.role || "Team Member";
+        let defaultReports = null;
+        if (roleStr.includes("Head") || roleStr.includes("CEO") || emp.name === "Aman Verma") {
+          defaultReports = null;
+        } else if (roleStr.includes("Manager") || roleStr.includes("Lead") || emp.name === "Rahul Sharma" || emp.name === "Priya Nair") {
+          defaultReports = "Aman Verma";
+        } else {
+          defaultReports = emp.department === "Product" ? "Priya Nair" : "Rahul Sharma";
+        }
+        return {
+          id: emp._id || emp.id || emp.empId,
+          name: emp.name,
+          role: roleStr,
+          department: emp.department || "Engineering",
+          reportsTo: emp.reportsTo || defaultReports,
+          avatar: emp.initials || emp.name.split(" ").map(w => w[0]).slice(0, 2).join(""),
+        };
+      })
+    : INITIAL_NODES;
 
   const [editingNode, setEditingNode] = useState(null);
   const [notification, setNotification] = useState(null);
@@ -61,6 +69,7 @@ export function OrgChartModule({ role }) {
   const isManagerOrAdmin = role === "Admin" || role === "Manager";
 
   const handleOpenEdit = (node) => {
+    if (!isManagerOrAdmin) return;
     setEditingNode(node);
     setEditForm({
       name: node.name,
@@ -73,32 +82,22 @@ export function OrgChartModule({ role }) {
   const handleSavePosition = (e) => {
     e.preventDefault();
     if (!editingNode) return;
-
-    const updated = nodes.map((n) => {
-      if (n.id === editingNode.id) {
-        return {
-          ...n,
-          role: editForm.role,
-          department: editForm.department,
-          reportsTo: editForm.reportsTo === "—" ? null : editForm.reportsTo,
-        };
-      }
-      return n;
-    });
-
-    setNodes(updated);
     setEditingNode(null);
     setNotification(`Updated position details for ${editingNode.name}!`);
     setTimeout(() => setNotification(null), 3500);
   };
 
-  const heads = nodes.filter((n) => !n.reportsTo);
-  const managers = nodes.filter((n) => n.reportsTo === "Aman Verma" || n.reportsTo === "Priya Nair");
-  const teamMembers = nodes.filter((n) => n.reportsTo === "Rahul Sharma");
+  const heads = activeNodes.filter((n) => !n.reportsTo || n.role.includes("Head") || n.role.includes("CEO") || n.name === "Aman Verma");
+  const headNames = new Set(heads.map((h) => h.name));
+
+  const managers = activeNodes.filter((n) => !headNames.has(n.name) && (n.reportsTo === "Aman Verma" || n.role.includes("Manager") || n.role.includes("Lead")));
+  const managerNames = new Set([...headNames, ...managers.map((m) => m.name)]);
+
+  const teamMembers = activeNodes.filter((n) => !managerNames.has(n.name));
 
   return (
     <>
-      <SectionTitle eyebrow="Structure" title="Organizational Hierarchy" />
+      <SectionTitle title="Organizational Hierarchy" />
 
       {notification && (
         <div style={{ background: "#2F8F8222", border: "1px solid #2F8F82", padding: "10px 16px", borderRadius: 10, color: "#2F8F82", fontSize: 13, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
@@ -106,7 +105,7 @@ export function OrgChartModule({ role }) {
         </div>
       )}
 
-      {editingNode && (
+      {editingNode && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
             <h3 className="nf-h3" style={{ marginBottom: 14 }}>Edit Employee Position — {editingNode.name}</h3>
@@ -118,106 +117,139 @@ export function OrgChartModule({ role }) {
                 <label style={{ flex: 1 }}>Department
                   <select className="nf-select" value={editForm.department} onChange={(e) => setEditForm({ ...editForm, department: e.target.value })}>
                     <option>Engineering</option>
-                    <option>HR</option>
+                    <option>Product</option>
+                    <option>Design</option>
+                    <option>Human Resources</option>
                     <option>Finance</option>
                     <option>Marketing</option>
+                    <option>Customer Success</option>
+                    <option>Analytics</option>
                   </select>
                 </label>
-                <label style={{ flex: 1 }}>Reports To Manager
-                  <select className="nf-select" value={editForm.reportsTo} onChange={(e) => setEditForm({ ...editForm, reportsTo: e.target.value })}>
-                    <option value="—">— (Executive Head)</option>
-                    <option value="Aman Verma">Aman Verma</option>
-                    <option value="Priya Nair">Priya Nair</option>
-                    <option value="Rahul Sharma">Rahul Sharma</option>
-                  </select>
+                <label style={{ flex: 1 }}>Reports To
+                  <input className="nf-select" value={editForm.reportsTo} onChange={(e) => setEditForm({ ...editForm, reportsTo: e.target.value })} required />
                 </label>
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 10, justifyContent: "flex-end" }}>
                 <button type="button" className="nf-btn ghost" onClick={() => setEditingNode(null)}>Cancel</button>
-                <button type="submit" className="nf-btn primary">Update Position</button>
+                <button type="submit" className="nf-btn primary">Save Changes</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      <Card style={{ padding: 28 }}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 32, alignItems: "center" }}>
-          <div style={{ textAlign: "center", width: "100%" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-dim)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
-              Level 1 — Executive Department Heads
-            </div>
-            <div style={{ display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap" }}>
-              {heads.map((n) => (
-                <NodeCard key={n.id} node={n} onEdit={() => handleOpenEdit(n)} canEdit={isManagerOrAdmin} />
-              ))}
-            </div>
+      <Card style={{ padding: 28, overflowX: "auto" }}>
+        {/* LEVEL 1: EXECUTIVE LEADERSHIP */}
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "var(--ink-dim)", textTransform: "uppercase", marginBottom: 12 }}>
+            Executive Leadership
           </div>
-
-          <div style={{ width: 2, height: 24, background: "var(--border)" }} />
-
-          <div style={{ textAlign: "center", width: "100%" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-dim)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
-              Level 2 — Engineering &amp; Operations Managers
-            </div>
-            <div style={{ display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap" }}>
-              {managers.map((n) => (
-                <NodeCard key={n.id} node={n} onEdit={() => handleOpenEdit(n)} canEdit={isManagerOrAdmin} />
-              ))}
-            </div>
+          <div style={{ display: "flex", justifyContent: "center", gap: 20 }}>
+            {heads.map((n) => {
+              const color = DEPT_COLORS[n.department] || "#E8A33D";
+              return (
+                <div
+                  key={n.id}
+                  style={{
+                    background: "var(--surface-alt)",
+                    border: `2px solid ${color}`,
+                    borderRadius: 14,
+                    padding: "16px 24px",
+                    minWidth: 240,
+                    boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div className="nf-avatar" style={{ background: `${color}26`, color: color, fontWeight: 700 }}>
+                      {n.avatar}
+                    </div>
+                    <div style={{ textAlign: "left" }}>
+                      <div style={{ fontWeight: 700, fontSize: 15 }}>{n.name}</div>
+                      <div style={{ fontSize: 12, color: color, fontWeight: 600 }}>{n.role}</div>
+                      <div style={{ fontSize: 11, color: "var(--ink-dim)", marginTop: 2 }}>{n.department}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
+        </div>
 
-          <div style={{ width: 2, height: 24, background: "var(--border)" }} />
+        {/* CONNECTOR LINE */}
+        <div style={{ width: 2, height: 28, background: "var(--border)", margin: "-16px auto 20px" }} />
 
-          <div style={{ textAlign: "center", width: "100%" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-dim)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 14 }}>
-              Level 3 — Engineering Leads &amp; Developers
-            </div>
-            <div style={{ display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
-              {teamMembers.map((n) => (
-                <NodeCard key={n.id} node={n} onEdit={() => handleOpenEdit(n)} canEdit={isManagerOrAdmin} />
-              ))}
-            </div>
+        {/* LEVEL 2: DEPARTMENT MANAGERS & LEADS */}
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "var(--ink-dim)", textTransform: "uppercase", marginBottom: 12 }}>
+            Department Management &amp; Leads ({managers.length})
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 16 }}>
+            {managers.map((n) => {
+              const color = DEPT_COLORS[n.department] || "#38BDF8";
+              return (
+                <div
+                  key={n.id}
+                  style={{
+                    background: "var(--surface-alt)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 12,
+                    padding: "12px 14px",
+                    textAlign: "left",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div className="nf-avatar sm" style={{ background: `${color}26`, color: color, fontWeight: 700 }}>
+                      {n.avatar}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, fontSize: 13 }}>{n.name}</div>
+                      <div style={{ fontSize: 11.5, color: "var(--ink-dim)" }}>{n.role}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* CONNECTOR LINE */}
+        <div style={{ width: 2, height: 28, background: "var(--border)", margin: "-16px auto 20px" }} />
+
+        {/* LEVEL 3: TEAM MEMBERS */}
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "var(--ink-dim)", textTransform: "uppercase", marginBottom: 12, textAlign: "center" }}>
+            Engineers &amp; Team Members ({teamMembers.length})
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
+            {teamMembers.map((n) => {
+              const color = DEPT_COLORS[n.department] || "#2F8F82";
+              return (
+                <div
+                  key={n.id}
+                  style={{
+                    background: "var(--surface-alt)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 10,
+                    padding: "10px 12px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                  }}
+                >
+                  <div className="nf-avatar sm" style={{ background: `${color}26`, color: color, fontWeight: 700 }}>
+                    {n.avatar}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 12.5 }}>{n.name}</div>
+                    <div style={{ fontSize: 11, color: "var(--ink-dim)" }}>{n.role}</div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </Card>
     </>
-  );
-}
-
-function NodeCard({ node, onEdit, canEdit }) {
-  const color = DEPT_COLORS[node.department] || "#2F8F82";
-  const initials = node.name.split(" ").map((p) => p[0]).slice(0, 2).join("");
-
-  return (
-    <div
-      style={{
-        background: "var(--surface-alt)",
-        border: "1px solid var(--border)",
-        borderRadius: 12,
-        padding: "12px 18px",
-        minWidth: 240,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-      }}
-    >
-      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-        <div className="nf-avatar sm" style={{ background: `${color}26`, color, fontWeight: 700 }}>
-          {initials}
-        </div>
-        <div style={{ textAlign: "left" }}>
-          <div style={{ fontWeight: 700, fontSize: 14 }}>{node.name}</div>
-          <div style={{ fontSize: 12, color: "var(--ink-dim)" }}>{node.role}</div>
-          <div style={{ fontSize: 10.5, color: color, fontWeight: 600, marginTop: 2 }}>{node.department}</div>
-        </div>
-      </div>
-      {canEdit && (
-        <button className="nf-btn ghost sm" title="Edit position" style={{ padding: "4px 8px" }} onClick={onEdit}>
-          <Edit3 size={13} />
-        </button>
-      )}
-    </div>
   );
 }
