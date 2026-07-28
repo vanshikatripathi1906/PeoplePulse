@@ -70,7 +70,7 @@ const EMPLOYEES_SEED = [
   {
     empId: "EMP-1004",
     name: "Vanshika Tripathi",
-    email: "vanshika.t@peoplepulse.co",
+    email: "vanshikapeoplepulse@gmail.com",
     password: "password123",
     role: "Employee",
     designation: "Frontend Developer",

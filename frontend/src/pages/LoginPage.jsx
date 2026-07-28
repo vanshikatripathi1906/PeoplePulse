@@ -8,7 +8,7 @@ export function LoginPage({ onLogin }) {
   const [mode, setMode] = useState("signin"); // "signin" or "register"
   
   // Sign-in states
-  const [email, setEmail] = useState("vanshika.t@peoplepulse.co");
+  const [email, setEmail] = useState("vanshikapeoplepulse@gmail.com");
   const [password, setPassword] = useState("••••••••");
   
   // Registration states
