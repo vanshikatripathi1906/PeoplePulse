@@ -427,9 +427,8 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
             ))}
           </div>
 
-          <div className="nf-grid-2" style={{ marginBottom: 28 }}>
+          <div style={{ marginBottom: 28, maxWidth: 800 }}>
             <UpcomingEventsCard />
-            <TopPerformersCard />
           </div>
 
           <div style={{ marginTop: 28 }}>
