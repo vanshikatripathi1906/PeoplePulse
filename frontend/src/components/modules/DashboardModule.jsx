@@ -5,6 +5,7 @@ import {
 import { Card } from "../common/Card";
 import { StatCard } from "../common/StatCard";
 import { SectionTitle } from "../common/SectionTitle";
+import { DEPT_COLORS } from "../common/EmployeeBadge";
 
 const DEFAULT_METRICS = {
   totalEmployees: 25,
@@ -22,8 +23,8 @@ const DEFAULT_METRICS = {
 };
 
 const DEFAULT_TOP_PERFORMERS = [
-  { name: "Aditi Tripathi", role: "Backend Developer", score: 98, avatar: "AT", color: "#38BDF8" },
-  { name: "Aman Verma", role: "Engineering Head", score: 96, avatar: "AV", color: "#E8A33D" },
+  { name: "Aman Verma", role: "Engineering Head", score: 98, avatar: "AV", color: "#E8A33D" },
+  { name: "Aditi Tripathi", role: "Backend Developer", score: 96, avatar: "AT", color: "#38BDF8" },
   { name: "Rahul Sharma", role: "Senior Engineering Manager", score: 94, avatar: "RS", color: "#2F8F82" },
   { name: "Priya Nair", role: "Product Head", score: 92, avatar: "PN", color: "#6C6FB0" },
   { name: "Vanshika Tripathi", role: "Frontend Developer", score: 91, avatar: "VT", color: "#EC4899" },
@@ -56,15 +57,6 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
     }
   });
 
-  const [topPerformersList, setTopPerformersList] = useState(() => {
-    try {
-      const saved = localStorage.getItem("peoplepulse_top_performers");
-      return saved ? JSON.parse(saved) : DEFAULT_TOP_PERFORMERS;
-    } catch (e) {
-      return DEFAULT_TOP_PERFORMERS;
-    }
-  });
-
   const [eventsList, setEventsList] = useState(() => {
     try {
       const saved = localStorage.getItem("peoplepulse_events");
@@ -94,6 +86,30 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
 
   const safeTotal = employees.length > 0 ? employees.length : metrics.totalEmployees;
   const safeApprovedLeave = leaveRequests.filter((r) => r.status === "Approved").length;
+
+  // DYNAMIC TOP PERFORMERS CALCULATED FROM MONGODB ATLAS DATABASE RECORDS
+  const computedTopPerformers = (employees && employees.length > 0)
+    ? [...employees]
+        .map((emp) => {
+          const t = Number(emp.perf?.Technical) || 8;
+          const c = Number(emp.perf?.Communication) || 8;
+          const l = Number(emp.perf?.Leadership) || 7;
+          const stars = Number(emp.perf?.stars) || Math.min(5, Math.max(1, Math.round((t + c + l) / 6)));
+          const score = Math.min(99, Math.round(((t + c + l) / 30) * 80 + stars * 4));
+          const avatar = emp.initials || (emp.name ? emp.name.split(" ").map((w) => w[0]).slice(0, 2).join("") : "EM");
+          return {
+            name: emp.name,
+            role: emp.designation || emp.role || "Team Member",
+            score: score,
+            avatar: avatar,
+            color: DEPT_COLORS[emp.department] || "#38BDF8",
+          };
+        })
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5)
+    : DEFAULT_TOP_PERFORMERS;
+
+  const employeeOfTheMonth = computedTopPerformers[0] || DEFAULT_TOP_PERFORMERS[0];
 
   const stats = [
     { label: "TOTAL EMPLOYEES", value: safeTotal.toString(), sub: "active workforce", icon: Users, accent: "#E8A33D", clickType: "total" },
@@ -146,8 +162,6 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
     setNotification(`Deleted event "${title}"`);
     setTimeout(() => setNotification(null), 3000);
   };
-
-  const employeeOfTheMonth = topPerformersList[0] || DEFAULT_TOP_PERFORMERS[0];
 
   // Helper Component: Upcoming Events Card
   const UpcomingEventsCard = () => (
@@ -252,11 +266,11 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
       </div>
 
       <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-dim)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-        Top 5 Performers Ranking
+        Top 5 Performers Ranking (Live Database)
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {topPerformersList.map((p, idx) => (
+        {computedTopPerformers.map((p, idx) => (
           <div
             key={p.name + idx}
             style={{
