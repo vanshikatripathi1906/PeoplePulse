@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Edit3, CheckCircle2, ShieldAlert, Sparkles, Star } from "lucide-react";
+import { Edit3, CheckCircle2, ShieldAlert, Star } from "lucide-react";
 import { Card } from "../common/Card";
 import { SectionTitle } from "../common/SectionTitle";
 import { DEPT_COLORS } from "../common/EmployeeBadge";
 import { updateEmployeeAPI } from "../../services/api";
 
-export function generateAISummary(tech, comm, lead, stars) {
+export function generatePerformanceSummary(tech, comm, lead, stars) {
   const t = Number(tech) || 7;
   const c = Number(comm) || 7;
   const l = Number(lead) || 7;
@@ -13,13 +13,13 @@ export function generateAISummary(tech, comm, lead, stars) {
   const s = Number(stars) || Math.min(5, Math.max(1, Math.round(avg / 2)));
 
   if (s >= 5 || avg >= 8.5) {
-    return `AI Review: Exceptional ${s}-star high performer! Exceeds expectations in technical delivery (${t}/10) and communication (${c}/10). Recommended for annual merit award and leadership track.`;
+    return `Performance Review: Exceptional ${s}-star high performer! Exceeds expectations in technical delivery (${t}/10) and communication (${c}/10). Recommended for annual merit award and leadership track.`;
   } else if (s >= 4 || avg >= 7.0) {
-    return `AI Review: Strong ${s}-star contributor! Demonstrates solid execution (${t}/10) and reliable team leadership (${l}/10). Consistent high-value team asset.`;
+    return `Performance Review: Strong ${s}-star contributor! Demonstrates solid execution (${t}/10) and reliable team leadership (${l}/10). Consistent high-value team asset.`;
   } else if (s >= 3 || avg >= 5.5) {
-    return `AI Review: Dependable ${s}-star rating. Meets core responsibilities in technical tasks (${t}/10) with steady communication (${c}/10). Recommended for targeted skill enhancement.`;
+    return `Performance Review: Dependable ${s}-star rating. Meets core responsibilities in technical tasks (${t}/10) with steady communication (${c}/10). Recommended for targeted skill enhancement.`;
   } else {
-    return `AI Review: ${s}-star performance review. Identified areas for growth in technical execution (${t}/10) and leadership alignment (${l}/10). Mentorship plan active.`;
+    return `Performance Review: ${s}-star performance review. Identified areas for growth in technical execution (${t}/10) and leadership alignment (${l}/10). Mentorship plan active.`;
   }
 }
 
@@ -71,7 +71,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
     const c = Number(perfForm.Communication);
     const l = Number(perfForm.Leadership);
     const stars = Number(perfForm.stars);
-    const aiSummary = generateAISummary(t, c, l, stars);
+    const perfSummary = generatePerformanceSummary(t, c, l, stars);
 
     const updatedPerf = {
       ...editingEmp.perf,
@@ -79,7 +79,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
       Communication: c,
       Leadership: l,
       stars: stars,
-      aiSummary: aiSummary,
+      aiSummary: perfSummary,
     };
 
     const updatedEmp = { ...editingEmp, perf: updatedPerf };
@@ -109,20 +109,13 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
     }
 
     setEditingEmp(null);
-    setNotification(`Updated performance & AI review for ${editingEmp.name}!`);
+    setNotification(`Updated performance evaluation for ${editingEmp.name}!`);
     setTimeout(() => setNotification(null), 3500);
   };
 
   return (
     <>
-      <SectionTitle
-        title="Performance Evaluation"
-        action={
-          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--ink-dim)" }}>
-            <Sparkles size={16} style={{ color: "#E8A33D" }} /> AI Assessment Engine Active
-          </div>
-        }
-      />
+      <SectionTitle title="Performance Evaluation" />
 
       {notification && (
         <div style={{ background: "#2F8F8222", border: "1px solid #2F8F82", padding: "10px 16px", borderRadius: 10, color: "#2F8F82", fontSize: 13, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
@@ -134,7 +127,6 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 460, width: "100%", margin: "auto", background: "var(--surface)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-              <Sparkles size={18} style={{ color: "#E8A33D" }} />
               <h3 className="nf-h3" style={{ margin: 0 }}>Edit Performance Rating — {editingEmp.name}</h3>
             </div>
             <form onSubmit={handleSavePerf} className="nf-form">
@@ -162,7 +154,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
 
               <div style={{ display: "flex", gap: 10, marginTop: 14, justifyContent: "flex-end" }}>
                 <button type="button" className="nf-btn ghost" onClick={() => setEditingEmp(null)}>Cancel</button>
-                <button type="submit" className="nf-btn primary">Save &amp; Generate AI Review</button>
+                <button type="submit" className="nf-btn primary">Save Performance Evaluation</button>
               </div>
             </form>
           </div>
@@ -177,7 +169,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
           const l = emp.perf?.Leadership || 7;
           const calculatedStars = Math.min(5, Math.max(1, Math.round((t + c + l) / 6)));
           const stars = emp.perf?.stars || calculatedStars;
-          const aiSummaryText = emp.perf?.aiSummary || generateAISummary(t, c, l, stars);
+          const summaryText = emp.perf?.aiSummary || generatePerformanceSummary(t, c, l, stars);
 
           return (
             <Card key={emp.empId || emp.id}>
@@ -214,7 +206,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
               </div>
 
               <div style={{ background: "var(--surface-alt)", padding: "12px 14px", borderRadius: 10, fontSize: 12.5, lineHeight: 1.5, color: "var(--ink)", borderLeft: "3px solid #E8A33D", marginBottom: 14 }}>
-                {aiSummaryText}
+                {summaryText}
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>

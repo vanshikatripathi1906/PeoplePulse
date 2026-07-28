@@ -32,7 +32,7 @@ const DEFAULT_TOP_PERFORMERS = [
 
 const DEFAULT_EVENTS = [
   { id: "e1", title: "Townhall Q3 Product Roadmap", day: "Tomorrow, 3:00 PM", tag: "All Hands Meeting", color: "#E8A33D" },
-  { id: "e2", title: "AI Skill Matrix Sync", day: "Friday, 11:30 AM", tag: "Engineering Team", color: "#38BDF8" },
+  { id: "e2", title: "Skill Matrix Sync", day: "Friday, 11:30 AM", tag: "Engineering Team", color: "#38BDF8" },
   { id: "e3", title: "Monthly Performance Review", day: "30 Jul, 2:00 PM", tag: "HR & Management", color: "#2F8F82" },
 ];
 
