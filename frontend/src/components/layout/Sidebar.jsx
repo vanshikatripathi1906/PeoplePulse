@@ -8,7 +8,7 @@ export const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["Admin", "Manager", "Employee"] },
   { key: "directory", label: "Directory", icon: Users, roles: ["Admin", "Manager"] },
   { key: "profile", label: "My Profile", icon: User, roles: ["Manager", "Employee"] },
-  { key: "attendance", label: "Attendance", icon: Clock, roles: ["Admin", "Manager", "Employee"] },
+  { key: "attendance", label: "Attendance", icon: Clock, roles: ["Manager", "Employee"] },
   { key: "leave", label: "Leave", icon: CalendarDays, roles: ["Admin", "Manager", "Employee"] },
   { key: "departments", label: "Departments", icon: Building2, roles: ["Admin", "Manager"] },
   { key: "tasks", label: "Tasks", icon: ListChecks, roles: ["Admin", "Manager", "Employee"] },
