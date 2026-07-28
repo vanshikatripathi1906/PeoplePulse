@@ -7,6 +7,27 @@ import { StatCard } from "../common/StatCard";
 import { SectionTitle } from "../common/SectionTitle";
 import { DEPT_COLORS } from "../common/EmployeeBadge";
 
+export function formatRelativeTime(timestamp) {
+  if (!timestamp) return "Just now";
+  const now = Date.now();
+  const ts = typeof timestamp === "number" ? timestamp : new Date(timestamp).getTime();
+  if (isNaN(ts)) return String(timestamp);
+
+  const diffMs = now - ts;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? "s" : ""} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays} days ago`;
+
+  const d = new Date(ts);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 const DEFAULT_METRICS = {
   totalEmployees: 25,
   employeesPresent: 22,
@@ -37,13 +58,12 @@ const DEFAULT_EVENTS = [
 ];
 
 const DEFAULT_ACTIVITIES = [
-  { id: "a1", time: "10 mins ago", title: "Leave Approved", text: "Medical leave for Vanshika Tripathi was approved by Admin.", type: "leave" },
-  { id: "a2", time: "1 hour ago", title: "New Task Assigned", text: "Build Payment Gateway was assigned to Aditi Tripathi.", type: "task" },
-  { id: "a3", time: "3 hours ago", title: "Attendance Marked", text: "22 employees checked in for today.", type: "attendance" },
+  { id: "a1", createdAt: Date.now() - 10 * 60 * 1000, title: "Leave Approved", text: "Medical leave for Vanshika Tripathi was approved by Admin.", type: "leave" },
+  { id: "a2", createdAt: Date.now() - 60 * 60 * 1000, title: "New Task Assigned", text: "Build Payment Gateway was assigned to Aditi Tripathi.", type: "task" },
+  { id: "a3", createdAt: Date.now() - 180 * 60 * 1000, title: "Attendance Marked", text: "22 employees checked in for today.", type: "attendance" },
 ];
 
 export function DashboardModule({ role, employees = [], leaveRequests = [], goProfile, currentUser }) {
-  const isManagerOrAdmin = role === "Admin" || role === "Manager";
   const isAdmin = role === "Admin";
   const isManager = role === "Manager";
   const isEmployee = role === "Employee";
@@ -135,7 +155,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
 
   const handleCreateEvent = (e) => {
     e.preventDefault();
-    if (!isManagerOrAdmin || !eventForm.title.trim()) return;
+    if (!isManager || !eventForm.title.trim()) return;
 
     const newEv = {
       id: `e${Date.now()}`,
@@ -159,7 +179,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
         id: Date.now(),
         title: "New Event Scheduled",
         message: `${newEv.title} has been scheduled for ${newEv.day}.`,
-        time: "Just now",
+        createdAt: Date.now(),
         unread: true,
       };
       localStorage.setItem("peoplepulse_notifications", JSON.stringify([newNotif, ...currentNotifs]));
@@ -170,7 +190,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
   };
 
   const handleDeleteEvent = (id, title) => {
-    if (!isManagerOrAdmin) return;
+    if (!isManager) return;
     const updated = eventsList.filter((e) => e.id !== id);
     setEventsList(updated);
     localStorage.setItem("peoplepulse_events", JSON.stringify(updated));
@@ -188,7 +208,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
           </div>
           <h3 className="nf-h3" style={{ margin: 0 }}>Upcoming Events</h3>
         </div>
-        {isManagerOrAdmin && (
+        {isManager && (
           <button className="nf-btn primary sm" onClick={() => setShowEventModal(true)}>
             <Plus size={13} /> Schedule Event
           </button>
@@ -218,7 +238,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
               </div>
             </div>
 
-            {isManagerOrAdmin && (
+            {isManager && (
               <button
                 className="nf-btn ghost sm danger"
                 title="Delete event"
@@ -374,8 +394,8 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
         </div>
       )}
 
-      {/* Schedule Event Modal */}
-      {showEventModal && isManagerOrAdmin && (
+      {/* Schedule Event Modal - ACCESSIBLE TO MANAGER ONLY */}
+      {showEventModal && isManager && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
             <h3 className="nf-h3" style={{ marginBottom: 14 }}>Schedule Company Event</h3>
@@ -418,7 +438,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
       {/* 3. ADMIN DASHBOARD: FULL COMPREHENSIVE VIEW */}
       {isAdmin && (
         <>
-          <div className="nf-grid-4" style={{ marginBottom: 28 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 28 }}>
             {stats.map((s) => (
               <div key={s.label} onClick={() => s.clickType && setModalType(s.clickType)} style={{ cursor: s.clickType ? "pointer" : "default" }}>
                 <StatCard {...s} />
@@ -461,7 +481,9 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
                         <div style={{ fontSize: 12, color: "var(--ink-dim)", marginTop: 2 }}>{act.text}</div>
                       </div>
                     </div>
-                    <div style={{ fontSize: 11, color: "var(--ink-dim)" }}>{act.time}</div>
+                    <div style={{ fontSize: 11, color: "var(--ink-dim)" }}>
+                      {formatRelativeTime(act.createdAt || act.timestamp || act.time)}
+                    </div>
                   </div>
                 ))}
               </div>

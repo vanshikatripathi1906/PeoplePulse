@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Bell, CheckCircle2, AlertCircle, Info, Calendar, Clock, Trash2, Check } from "lucide-react";
 import { Card } from "../common/Card";
 import { SectionTitle } from "../common/SectionTitle";
+import { formatRelativeTime } from "./DashboardModule";
 
 const INITIAL_NOTIFICATIONS = [
-  { id: 1, title: "Leave Request Approved", message: "Your leave application for 28 Jul has been approved by Rahul Sharma.", time: "10 mins ago", type: "success", read: false, recipient: "Vanshika Tripathi" },
-  { id: 2, title: "New Task Assigned", message: "Aman Verma assigned you 'Redesign employee card'. Due date: 28 Jul.", time: "1 hour ago", type: "info", read: false, recipient: "Vanshika Tripathi" },
-  { id: 3, title: "Upcoming Townhall Meeting", message: "Annual Townhall is scheduled for tomorrow at 04:00 PM in Orion Boardroom.", time: "3 hours ago", type: "warning", read: true },
-  { id: 4, title: "Performance Rating Updated", message: "Your performance evaluation and AI review has been updated by Manager.", time: "Yesterday", type: "info", read: true, recipient: "Vanshika Tripathi" },
+  { id: 1, title: "Leave Request Approved", message: "Your leave application for 28 Jul has been approved by Rahul Sharma.", createdAt: Date.now() - 10 * 60 * 1000, type: "success", read: false, recipient: "Vanshika Tripathi" },
+  { id: 2, title: "New Task Assigned", message: "Aman Verma assigned you 'Redesign employee card'. Due date: 28 Jul.", createdAt: Date.now() - 60 * 60 * 1000, type: "info", read: false, recipient: "Vanshika Tripathi" },
+  { id: 3, title: "Upcoming Townhall Meeting", message: "Annual Townhall is scheduled for tomorrow at 04:00 PM in Orion Boardroom.", createdAt: Date.now() - 180 * 60 * 1000, type: "warning", read: true },
+  { id: 4, title: "Performance Rating Updated", message: "Your performance evaluation has been updated by Manager.", createdAt: Date.now() - 24 * 60 * 60 * 1000, type: "info", read: true, recipient: "Vanshika Tripathi" },
 ];
 
 export function NotificationsModule({ role, currentUser }) {
@@ -84,7 +85,7 @@ export function NotificationsModule({ role, currentUser }) {
                   <div style={{ fontWeight: item.read ? 600 : 700, fontSize: 14 }}>{item.title}</div>
                   <div style={{ fontSize: 12.5, color: "var(--ink-dim)", marginTop: 4 }}>{item.message}</div>
                   <div style={{ fontSize: 11, color: "var(--ink-dim)", marginTop: 6, display: "flex", alignItems: "center", gap: 4 }}>
-                    <Clock size={11} /> {item.time}
+                    <Clock size={11} /> {formatRelativeTime(item.createdAt || item.timestamp || item.time)}
                   </div>
                 </div>
               </div>
