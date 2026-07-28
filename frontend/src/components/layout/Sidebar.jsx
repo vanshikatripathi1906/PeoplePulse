@@ -16,7 +16,7 @@ export const NAV_ITEMS = [
   { key: "aisearch", label: "Skill Search", icon: Sparkles, roles: ["Manager"] },
   { key: "assets", label: "Assets", icon: Laptop, roles: ["Admin"] },
   { key: "rooms", label: "Meeting Rooms", icon: DoorOpen, roles: ["Admin"] },
-  { key: "orgchart", label: "Org Chart", icon: Network, roles: ["Admin", "Manager"] },
+  { key: "orgchart", label: "Org Chart", icon: Network, roles: ["Admin", "Manager", "Employee"] },
   { key: "payroll", label: "Payroll", icon: Wallet, roles: ["Manager", "Employee"] },
   { key: "notifications", label: "Notifications", icon: Bell, roles: ["Admin", "Manager", "Employee"] },
 ];
