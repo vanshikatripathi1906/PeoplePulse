@@ -23,7 +23,7 @@ export function NotificationsModule({ role, currentUser }) {
   // Filter notifications by recipient if role is Employee
   const notifications = role === "Employee" && currentUser?.name
     ? rawNotifs.filter(
-        (n) => !n.recipient || n.recipient.toLowerCase() === currentUser.name.toLowerCase() || n.recipient === "Vanshika Tripathi"
+        (n) => !n.recipient || n.recipient.toLowerCase() === currentUser.name.toLowerCase()
       )
     : rawNotifs;
 

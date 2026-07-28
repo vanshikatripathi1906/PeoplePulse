@@ -18,7 +18,7 @@ export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave,
 
   // Filter requests for Employee role: show ONLY requests filed by the logged-in employee
   const reqs = role === "Employee" && currentUser?.name
-    ? allReqs.filter((r) => r.employee.toLowerCase() === currentUser.name.toLowerCase() || r.employee === "Vanshika Tripathi")
+    ? allReqs.filter((r) => r.employee.toLowerCase() === currentUser.name.toLowerCase())
     : allReqs;
 
   const [form, setForm] = useState({ type: "Casual", start: "", end: "", reason: "" });

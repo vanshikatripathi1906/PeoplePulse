@@ -31,11 +31,14 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
   const isManagerOrAdmin = role === "Manager" || role === "Admin";
   const isEmployee = role === "Employee";
 
-  // Filter performance list by role
+  // Filter performance list strictly by current logged-in user for Employee role
   let displayEmployees = employees;
-  if (isEmployee && currentUser?.name) {
+  if (isEmployee && currentUser) {
     displayEmployees = employees.filter(
-      (e) => e.email?.toLowerCase() === currentUser.email?.toLowerCase() || e.name?.toLowerCase() === currentUser.name?.toLowerCase() || e.name === "Vanshika Tripathi"
+      (e) =>
+        (e.email && currentUser.email && e.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+        (e.name && currentUser.name && e.name.toLowerCase() === currentUser.name.toLowerCase()) ||
+        (e.empId && currentUser.empId && e.empId === currentUser.empId)
     );
   } else if (role === "Manager" && currentUser?.department) {
     displayEmployees = employees.filter(
@@ -113,7 +116,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
   return (
     <>
       <SectionTitle
-        title={isEmployee ? "My Performance & AI Review" : "Performance & AI Evaluations"}
+        title="Performance Evaluation"
         action={
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--ink-dim)" }}>
             <Sparkles size={16} style={{ color: "#E8A33D" }} /> AI Assessment Engine Active
@@ -132,7 +135,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
           <div className="nf-card" style={{ maxWidth: 460, width: "100%", margin: "auto", background: "var(--surface)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
               <Sparkles size={18} style={{ color: "#E8A33D" }} />
-              <h3 className="nf-h3" style={{ margin: 0 }}>Edit Performance &amp; AI Rating — {editingEmp.name}</h3>
+              <h3 className="nf-h3" style={{ margin: 0 }}>Edit Performance Rating — {editingEmp.name}</h3>
             </div>
             <form onSubmit={handleSavePerf} className="nf-form">
               <label>Star Rating (1 - 5 Stars)
