@@ -59,6 +59,22 @@ export function AssetsModule({ role, employees }) {
       status: "Assigned",
     };
 
+    // Dispatch notification to recipient employee
+    try {
+      const savedNotifs = localStorage.getItem("peoplepulse_notifications");
+      const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];
+      const newNotif = {
+        id: Date.now(),
+        title: "New Asset Assigned",
+        message: `Admin assigned new company asset "${newAsset.name}" (${newAsset.category}) to you.`,
+        createdAt: Date.now(),
+        type: "info",
+        recipient: newAsset.assignedTo,
+        unread: true,
+      };
+      localStorage.setItem("peoplepulse_notifications", JSON.stringify([newNotif, ...currentNotifs]));
+    } catch (err) {}
+
     setAssets([newAsset, ...assets]);
     setShowAddModal(false);
     setNotification(`Successfully assigned ${addForm.name} to ${addForm.assignedTo}!`);

@@ -356,15 +356,17 @@ export function DashboardPage({ role, onLogout }) {
       };
       localStorage.setItem("peoplepulse_dashboard_metrics", JSON.stringify(newMetrics));
 
-      if (newStatus === "Approved") {
-        const targetReq = updated.find((r) => r.id === id);
+      const targetReq = updated.find((r) => r.id === id);
+      if (targetReq) {
         const savedNotifs = localStorage.getItem("peoplepulse_notifications");
         const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];
         const newNotif = {
           id: Date.now(),
-          title: "Leave Approved",
-          message: `Leave request for ${targetReq?.employee || "Employee"} (${targetReq?.type || "Leave"}) was approved by ${role}.`,
-          time: "Just now",
+          title: `Leave ${newStatus}`,
+          message: `Your leave request for ${targetReq.type || "Leave"} (${targetReq.days || 1} day) was ${newStatus.toLowerCase()} by ${role}.`,
+          createdAt: Date.now(),
+          type: newStatus === "Approved" ? "success" : "warning",
+          recipient: targetReq.employee,
           unread: true,
         };
         localStorage.setItem("peoplepulse_notifications", JSON.stringify([newNotif, ...currentNotifs]));
