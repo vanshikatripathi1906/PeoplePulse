@@ -21,12 +21,20 @@ export function NotificationsModule({ role, currentUser }) {
     localStorage.setItem("peoplepulse_notifications", JSON.stringify(rawNotifs));
   }, [rawNotifs]);
 
-  // Filter notifications by recipient if role is Employee
-  const notifications = role === "Employee" && currentUser?.name
-    ? rawNotifs.filter(
-        (n) => !n.recipient || n.recipient.toLowerCase() === currentUser.name.toLowerCase()
-      )
-    : rawNotifs;
+  // Filter notifications strictly by recipient for ALL users
+  const notifications = rawNotifs.filter((n) => {
+    if (!n.recipient) return false;
+    const recipientLower = (n.recipient || "").toLowerCase();
+    const currentNameLower = (currentUser?.name || "").toLowerCase();
+    const currentEmailLower = (currentUser?.email || "").toLowerCase();
+    const currentRoleLower = (role || "").toLowerCase();
+
+    return (
+      (currentNameLower && recipientLower === currentNameLower) ||
+      (currentEmailLower && recipientLower === currentEmailLower) ||
+      (currentRoleLower && recipientLower === currentRoleLower)
+    );
+  });
 
   const handleDeleteOne = (id) => {
     setRawNotifs(rawNotifs.filter((n) => n.id !== id));
