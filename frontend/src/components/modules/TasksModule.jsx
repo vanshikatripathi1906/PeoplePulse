@@ -94,7 +94,7 @@ export function TasksModule({ role, employees = [], currentUser }) {
 
   const handleCreateTask = async (e) => {
     e.preventDefault();
-    if (!isManagerOrAdmin || !addForm.title.trim()) return;
+    if (role !== "Manager" || !addForm.title.trim()) return;
 
     const newTask = {
       id: `t${Date.now()}`,
@@ -202,7 +202,7 @@ export function TasksModule({ role, employees = [], currentUser }) {
       <SectionTitle
         title={isEmployee ? "My Assigned Tasks" : "Task Board"}
         action={
-          isManagerOrAdmin ? (
+          role === "Manager" ? (
             <button className="nf-btn primary" onClick={() => setShowAddModal(true)}>
               <Plus size={14} /> New task
             </button>
@@ -220,7 +220,7 @@ export function TasksModule({ role, employees = [], currentUser }) {
         </div>
       )}
 
-      {showAddModal && isManagerOrAdmin && (
+      {showAddModal && role === "Manager" && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 460, width: "100%", margin: "auto", background: "var(--surface)" }}>
             <h3 className="nf-h3" style={{ marginBottom: 14 }}>Assign New Task</h3>
