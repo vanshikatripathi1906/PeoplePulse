@@ -60,7 +60,7 @@ Issued by PeoplePulse Finance & Payroll Department.
 
   return (
     <>
-      <SectionTitle eyebrow="Compensation" title="Payroll" />
+      <SectionTitle title="Payroll" />
 
       {notification && (
         <div style={{ background: "#2F8F8222", border: "1px solid #2F8F82", padding: "10px 16px", borderRadius: 10, color: "#2F8F82", fontSize: 13, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>

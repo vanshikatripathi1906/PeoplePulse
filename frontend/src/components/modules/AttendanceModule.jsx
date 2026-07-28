@@ -147,7 +147,7 @@ export function AttendanceModule({ role, employees }) {
 
   return (
     <>
-      <SectionTitle eyebrow="Time & Attendance" title="Attendance Calendar" />
+      <SectionTitle title="Attendance Calendar" />
 
       <Card style={{ marginBottom: 24, padding: 22 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>

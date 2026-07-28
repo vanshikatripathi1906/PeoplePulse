@@ -60,7 +60,6 @@ export function AIResumeSearchModule({ employees }) {
   return (
     <>
       <SectionTitle
-        eyebrow="Search Engine"
         title="Skill Search"
       />
 
