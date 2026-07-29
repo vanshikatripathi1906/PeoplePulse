@@ -44,7 +44,33 @@ export function LoginPage({ onLogin }) {
           department: regDepartment,
           role: "Employee",
         });
-        setStatusMessage(res.message || "Registration submitted! Pending Admin authorization.");
+
+        // Dispatch access request notification directly to Admin
+        try {
+          const savedNotifs = localStorage.getItem("peoplepulse_notifications");
+          const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];
+          const newAccessNotif = {
+            id: Date.now(),
+            title: "New User Access Request",
+            message: `${regName} (${regEmail}) requested access to join PeoplePulse as ${regDesignation} in ${regDepartment}.`,
+            createdAt: Date.now(),
+            type: "warning",
+            recipient: "Admin",
+            unread: true,
+            accessRequest: {
+              name: regName,
+              email: regEmail,
+              password: regPassword,
+              designation: regDesignation,
+              department: regDepartment,
+              role: "Employee",
+              empId: `EMP-${Math.floor(1000 + Math.random() * 9000)}`,
+            },
+          };
+          localStorage.setItem("peoplepulse_notifications", JSON.stringify([newAccessNotif, ...currentNotifs]));
+        } catch (e) {}
+
+        setStatusMessage(res.message || "Registration submitted! Request sent to Admin for approval.");
         setMode("signin");
         setEmail(regEmail);
         setRegName("");

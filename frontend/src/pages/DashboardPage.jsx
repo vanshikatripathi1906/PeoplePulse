@@ -446,7 +446,14 @@ export function DashboardPage({ role, onLogout }) {
   } else if (currentPage === "analytics") {
     pageContent = <AnalyticsModule employees={employeesList} />;
   } else if (currentPage === "notifications") {
-    pageContent = <NotificationsModule role={role} currentUser={loggedInUser} />;
+    pageContent = (
+      <NotificationsModule
+        role={role}
+        currentUser={loggedInUser}
+        onApprovePending={handleApprovePendingUser}
+        onRejectPending={handleRejectPendingUser}
+      />
+    );
   }
 
   return (

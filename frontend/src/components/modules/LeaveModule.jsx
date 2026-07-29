@@ -104,7 +104,7 @@ export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave,
                 </div>
 
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  {r.status === "Pending" && role !== "Employee" ? (
+                  {r.status === "Pending" && role === "Manager" ? (
                     <div style={{ display: "flex", gap: 6 }}>
                       <button className="nf-btn ghost sm" title="Approve Leave" onClick={() => act(r.id, "Approved")}><Check size={13} /></button>
                       <button className="nf-btn ghost sm danger" title="Reject Leave" onClick={() => act(r.id, "Rejected")}><X size={13} /></button>
