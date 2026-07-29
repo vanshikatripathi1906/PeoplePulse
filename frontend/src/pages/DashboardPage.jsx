@@ -250,14 +250,17 @@ export function DashboardPage({ role, onLogout }) {
   };
 
   const handleAddEmployee = async (newEmp) => {
+    let createdEmp = newEmp;
     try {
       const savedDoc = await createEmployeeAPI(newEmp);
-      if (savedDoc && savedDoc._id) {
-        newEmp._id = savedDoc._id;
+      if (savedDoc && (savedDoc._id || savedDoc.id)) {
+        createdEmp = savedDoc;
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error("Failed creating employee via API", e);
+    }
 
-    const updatedList = [newEmp, ...employeesList];
+    const updatedList = [createdEmp, ...employeesList];
     setEmployeesList(updatedList);
 
     try {
@@ -266,7 +269,7 @@ export function DashboardPage({ role, onLogout }) {
       const newMetrics = {
         ...currentMetrics,
         totalEmployees: updatedList.length,
-        employeesPresent: Math.round(updatedList.length * 0.88),
+        employeesPresent: Math.max(1, updatedList.length - 2),
       };
       localStorage.setItem("peoplepulse_dashboard_metrics", JSON.stringify(newMetrics));
 
@@ -275,14 +278,21 @@ export function DashboardPage({ role, onLogout }) {
       const newNotif = {
         id: Date.now(),
         title: "New Employee Joined",
-        message: `${newEmp.name} (${newEmp.designation}) has joined the ${newEmp.department} department as ${newEmp.empId}.`,
-        time: "Just now",
+        message: `${createdEmp.name} (${createdEmp.designation}) has joined the ${createdEmp.department} department as ${createdEmp.empId}.`,
+        createdAt: Date.now(),
         unread: true,
       };
       localStorage.setItem("peoplepulse_notifications", JSON.stringify([newNotif, ...currentNotifs]));
     } catch (e) {
       console.error("Failed syncing metrics or notification", e);
     }
+
+    try {
+      const res = await fetchEmployeesAPI();
+      if (res && Array.isArray(res) && res.length > 0) {
+        setEmployeesList(res);
+      }
+    } catch (e) {}
   };
 
   const handleDeleteEmployee = async (empId) => {

@@ -4,23 +4,7 @@ import { loginAPI } from "../services/api";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    try {
-      const savedToken = localStorage.getItem("token");
-      const savedRole = localStorage.getItem("role");
-      const savedUser = localStorage.getItem("user_info");
-      if (savedToken && savedRole) {
-        return savedUser ? JSON.parse(savedUser) : {
-          role: savedRole,
-          name: savedRole === "Admin" ? "Aman Verma" : savedRole === "Manager" ? "Rahul Sharma" : "Vanshika Tripathi",
-          token: savedToken,
-        };
-      }
-    } catch (e) {
-      console.error("Failed loading auth session from localStorage", e);
-    }
-    return null;
-  });
+  const [user, setUser] = useState(null);
 
   const login = async (role, credentials) => {
     const selectedRole = role || "Employee";

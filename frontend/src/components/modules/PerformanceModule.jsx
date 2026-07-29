@@ -205,9 +205,6 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
                 </div>
               </div>
 
-              <div style={{ background: "var(--surface-alt)", padding: "12px 14px", borderRadius: 10, fontSize: 12.5, lineHeight: 1.5, color: "var(--ink)", borderLeft: "3px solid #E8A33D", marginBottom: 14 }}>
-                {summaryText}
-              </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
                 <div style={{ background: "var(--surface-alt)", padding: "8px 10px", borderRadius: 8, textAlign: "center" }}>

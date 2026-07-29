@@ -449,46 +449,6 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
           <div style={{ marginBottom: 28, maxWidth: 800 }}>
             <UpcomingEventsCard />
           </div>
-
-          <div style={{ marginTop: 28 }}>
-            <Card>
-              <div style={{ display: "flex", alignItems: "center", justifyBetween: "space-between", marginBottom: 16 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div className="nf-avatar sm" style={{ background: "#2F8F8226", color: "#2F8F82" }}>
-                    <Activity size={16} />
-                  </div>
-                  <h3 className="nf-h3" style={{ margin: 0 }}>Recent Activity Feed</h3>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {activitiesList.map((act) => (
-                  <div
-                    key={act.id}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      padding: "10px 14px",
-                      background: "var(--surface-alt)",
-                      borderRadius: 10,
-                      fontSize: 13,
-                    }}
-                  >
-                    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                      <div>
-                        <div style={{ fontWeight: 600 }}>{act.title}</div>
-                        <div style={{ fontSize: 12, color: "var(--ink-dim)", marginTop: 2 }}>{act.text}</div>
-                      </div>
-                    </div>
-                    <div style={{ fontSize: 11, color: "var(--ink-dim)" }}>
-                      {formatRelativeTime(act.createdAt || act.timestamp || act.time)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </div>
         </>
       )}
     </>
