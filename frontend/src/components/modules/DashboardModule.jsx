@@ -28,6 +28,32 @@ export function formatRelativeTime(timestamp) {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+export function formatEventDateLabel(dateStr, fallbackDayStr) {
+  if (!dateStr) return fallbackDayStr || "UPCOMING";
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const evDate = new Date(dateStr);
+  if (isNaN(evDate.getTime())) return fallbackDayStr || "UPCOMING";
+  evDate.setHours(0, 0, 0, 0);
+
+  const diffTime = evDate.getTime() - today.getTime();
+  const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
+
+  if (diffDays < 0) {
+    // Event date has passed -> Expired!
+    return null;
+  }
+
+  const dayName = evDate.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase();
+  const monthName = evDate.toLocaleDateString("en-US", { month: "short" }).toUpperCase();
+  const dayNum = String(evDate.getDate()).padStart(2, "0");
+
+  if (diffDays === 0) return `TODAY, ${dayNum} ${monthName}`;
+  if (diffDays === 1) return `TOMORROW, ${dayNum} ${monthName}`;
+  return `${dayName}, ${dayNum} ${monthName}`;
+}
+
 const DEFAULT_METRICS = {
   totalEmployees: 25,
   employeesPresent: 22,
@@ -52,15 +78,9 @@ const DEFAULT_TOP_PERFORMERS = [
 ];
 
 const DEFAULT_EVENTS = [
-  { id: "e1", title: "Townhall Q3 Product Roadmap", day: "Tomorrow, 3:00 PM", tag: "All Hands Meeting", color: "#E8A33D" },
-  { id: "e2", title: "Skill Matrix Sync", day: "Friday, 11:30 AM", tag: "Engineering Team", color: "#38BDF8" },
-  { id: "e3", title: "Monthly Performance Review", day: "30 Jul, 2:00 PM", tag: "HR & Management", color: "#2F8F82" },
-];
-
-const DEFAULT_ACTIVITIES = [
-  { id: "a1", createdAt: Date.now() - 10 * 60 * 1000, title: "Leave Approved", text: "Medical leave for Vanshika Tripathi was approved by Admin.", type: "leave" },
-  { id: "a2", createdAt: Date.now() - 60 * 60 * 1000, title: "New Task Assigned", text: "Build Payment Gateway was assigned to Aditi Tripathi.", type: "task" },
-  { id: "a3", createdAt: Date.now() - 180 * 60 * 1000, title: "Attendance Marked", text: "22 employees checked in for today.", type: "attendance" },
+  { id: "e1", title: "Townhall Q3 Product Roadmap", date: "2026-07-30", time: "3:00 PM", day: "TOMORROW, 30 JUL", tag: "All Hands Meeting", color: "#E8A33D" },
+  { id: "e2", title: "Skill Matrix Sync", date: "2026-07-31", time: "11:30 AM", day: "FRI, 31 JUL", tag: "Engineering Team", color: "#38BDF8" },
+  { id: "e3", title: "Monthly Performance Review", date: "2026-08-03", time: "2:00 PM", day: "MON, 03 AUG", tag: "HR & Management", color: "#2F8F82" },
 ];
 
 export function DashboardModule({ role, employees = [], leaveRequests = [], goProfile, currentUser }) {
@@ -88,24 +108,29 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
     }
   });
 
-  const [activitiesList, setActivitiesList] = useState(() => {
-    try {
-      const saved = localStorage.getItem("peoplepulse_activities");
-      return saved ? JSON.parse(saved) : DEFAULT_ACTIVITIES;
-    } catch (e) {
-      return DEFAULT_ACTIVITIES;
-    }
-  });
-
   const [notification, setNotification] = useState(null);
 
   // Modals
   const [showEventModal, setShowEventModal] = useState(false);
-  const [eventForm, setEventForm] = useState({ title: "", day: "Tomorrow, 3:00 PM", tag: "General" });
+  const [eventForm, setEventForm] = useState({ title: "", date: "2026-07-30", time: "03:00 PM", tag: "All Hands Meeting" });
   const [modalType, setModalType] = useState(null);
 
   const safeTotal = employees.length > 0 ? employees.length : metrics.totalEmployees;
   const safeApprovedLeave = leaveRequests.filter((r) => r.status === "Approved").length;
+
+  // Filter active future upcoming events only (expired past events automatically removed)
+  const activeUpcomingEvents = eventsList.filter((ev) => {
+    if (ev.date) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const evDate = new Date(ev.date);
+      evDate.setHours(0, 0, 0, 0);
+      if (evDate.getTime() < today.getTime()) {
+        return false; // Expired event date -> automatically remove from list!
+      }
+    }
+    return true;
+  });
 
   // DYNAMIC DEPARTMENT-WISE TOP PERFORMERS & RANKINGS FROM MONGODB ATLAS
   const allScoredEmployees = (employees && employees.length > 0)
@@ -155,12 +180,20 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
 
   const handleCreateEvent = (e) => {
     e.preventDefault();
-    if (!isManager || !eventForm.title.trim()) return;
+    if (!isManager || !eventForm.title.trim() || !eventForm.date) return;
+
+    const formattedLabel = formatEventDateLabel(eventForm.date, eventForm.date);
+    if (!formattedLabel) {
+      alert("Cannot schedule an event in the past!");
+      return;
+    }
 
     const newEv = {
       id: `e${Date.now()}`,
       title: eventForm.title,
-      day: eventForm.day,
+      date: eventForm.date,
+      time: eventForm.time || "3:00 PM",
+      day: formattedLabel,
       tag: eventForm.tag,
       color: "#38BDF8",
     };
@@ -169,7 +202,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
     setEventsList(updated);
     localStorage.setItem("peoplepulse_events", JSON.stringify(updated));
     setShowEventModal(false);
-    setEventForm({ title: "", day: "Tomorrow, 3:00 PM", tag: "General" });
+    setEventForm({ title: "", date: "2026-07-30", time: "03:00 PM", tag: "General" });
 
     // Send Notification
     try {
@@ -178,14 +211,14 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
       const newNotif = {
         id: Date.now(),
         title: "New Event Scheduled",
-        message: `${newEv.title} has been scheduled for ${newEv.day}.`,
+        message: `${newEv.title} has been scheduled for ${newEv.day} (${newEv.time}).`,
         createdAt: Date.now(),
         unread: true,
       };
       localStorage.setItem("peoplepulse_notifications", JSON.stringify([newNotif, ...currentNotifs]));
     } catch (e) {}
 
-    setNotification(`Event "${eventForm.title}" scheduled successfully!`);
+    setNotification(`Event "${eventForm.title}" scheduled successfully for ${formattedLabel}!`);
     setTimeout(() => setNotification(null), 3500);
   };
 
@@ -216,42 +249,47 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {eventsList.map((ev) => (
-          <div
-            key={ev.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "12px 14px",
-              background: "var(--surface-alt)",
-              borderRadius: 10,
-            }}
-          >
-            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-              <div style={{ textAlign: "center", minWidth: 100, padding: "4px 8px", background: "var(--surface)", borderRadius: 8, border: "1px solid var(--border)" }}>
-                <div style={{ fontSize: 10.5, fontWeight: 700, color: ev.color, textTransform: "uppercase" }}>{ev.day}</div>
+        {activeUpcomingEvents.map((ev) => {
+          const dateLabel = formatEventDateLabel(ev.date, ev.day);
+          if (!dateLabel) return null; // Past expired event!
+
+          return (
+            <div
+              key={ev.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "12px 14px",
+                background: "var(--surface-alt)",
+                borderRadius: 10,
+              }}
+            >
+              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                <div style={{ textAlign: "center", minWidth: 120, padding: "4px 8px", background: "var(--surface)", borderRadius: 8, border: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: ev.color, textTransform: "uppercase" }}>{dateLabel}</div>
+                </div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>{ev.title}</div>
+                  <div style={{ fontSize: 11.5, color: "var(--ink-dim)" }}>{ev.tag} {ev.time ? `· ${ev.time}` : ""}</div>
+                </div>
               </div>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 14 }}>{ev.title}</div>
-                <div style={{ fontSize: 11.5, color: "var(--ink-dim)" }}>{ev.tag}</div>
-              </div>
+
+              {isManager && (
+                <button
+                  className="nf-btn ghost sm danger"
+                  title="Delete event"
+                  style={{ padding: "4px 8px" }}
+                  onClick={() => handleDeleteEvent(ev.id, ev.title)}
+                >
+                  <Trash2 size={13} />
+                </button>
+              )}
             </div>
+          );
+        })}
 
-            {isManager && (
-              <button
-                className="nf-btn ghost sm danger"
-                title="Delete event"
-                style={{ padding: "4px 8px" }}
-                onClick={() => handleDeleteEvent(ev.id, ev.title)}
-              >
-                <Trash2 size={13} />
-              </button>
-            )}
-          </div>
-        ))}
-
-        {eventsList.length === 0 && (
+        {activeUpcomingEvents.length === 0 && (
           <div className="nf-empty" style={{ padding: 18 }}>No upcoming events scheduled.</div>
         )}
       </div>
@@ -403,9 +441,14 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
               <label>Event Title
                 <input className="nf-select" placeholder="e.g. Q3 Townhall" value={eventForm.title} onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })} required />
               </label>
-              <label>Date &amp; Time
-                <input className="nf-select" placeholder="e.g. Friday, 3:00 PM" value={eventForm.day} onChange={(e) => setEventForm({ ...eventForm, day: e.target.value })} required />
-              </label>
+              <div style={{ display: "flex", gap: 10 }}>
+                <label style={{ flex: 1 }}>Event Date
+                  <input type="date" className="nf-select" value={eventForm.date} onChange={(e) => setEventForm({ ...eventForm, date: e.target.value })} required />
+                </label>
+                <label style={{ flex: 1 }}>Time
+                  <input type="text" className="nf-select" placeholder="e.g. 3:00 PM" value={eventForm.time} onChange={(e) => setEventForm({ ...eventForm, time: e.target.value })} required />
+                </label>
+              </div>
               <label>Event Tag / Department
                 <input className="nf-select" placeholder="e.g. All Hands Meeting" value={eventForm.tag} onChange={(e) => setEventForm({ ...eventForm, tag: e.target.value })} required />
               </label>
