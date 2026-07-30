@@ -10,10 +10,19 @@ import { AttendanceStrip, STATUS_LABEL, STATUS_COLOR } from "../common/Attendanc
 import { DEPT_COLORS } from "../common/EmployeeBadge";
 
 function MonthlyAttendanceView({ empName }) {
+  const todayISO = new Date().toISOString().slice(0, 10);
   const [records] = useState(() => {
     try {
       const saved = localStorage.getItem("peoplepulse_attendance_records");
-      return saved ? JSON.parse(saved) : [];
+      const list = saved ? JSON.parse(saved) : [];
+      const todayCheck = localStorage.getItem(`peoplepulse_checkin_${todayISO}`);
+      if (todayCheck) {
+        const parsed = JSON.parse(todayCheck);
+        if (parsed.checkedIn || parsed.checkInTime) {
+          list.push({ employee: empName, date: todayISO, status: "Present" });
+        }
+      }
+      return list;
     } catch (e) {
       return [];
     }
@@ -23,11 +32,11 @@ function MonthlyAttendanceView({ empName }) {
     (r) => r.employee && r.employee.toLowerCase() === (empName || "").toLowerCase()
   );
 
-  const presentDays = userRecords.filter((r) => r.status === "Present").length || 22;
-  const leaveDays = userRecords.filter((r) => r.status === "On Leave" || r.status === "Leave").length || 1;
-  const wfhDays = userRecords.filter((r) => r.status === "WFH").length || 2;
+  const presentDays = userRecords.filter((r) => r.status === "Present" || r.status === "P").length;
+  const leaveDays = userRecords.filter((r) => r.status === "On Leave" || r.status === "Leave").length;
+  const wfhDays = userRecords.filter((r) => r.status === "WFH").length;
   const totalWorkingDays = 25;
-  const attendanceRate = Math.round((presentDays / totalWorkingDays) * 100);
+  const attendanceRate = totalWorkingDays > 0 ? Math.round((presentDays / totalWorkingDays) * 100) : 0;
 
   const daysInMonth = 31;
   const calendarGrid = Array.from({ length: daysInMonth }, (_, i) => {
