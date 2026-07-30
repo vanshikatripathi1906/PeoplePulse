@@ -9,7 +9,7 @@ const EXTRA_DEPARTMENTS = [
   { name: "IT Infrastructure", head: "Siddharth Jain", count: 24, avgExp: "5.1 Years", projects: 5 },
 ];
 
-export function DepartmentsModule({ role, departments, currentUser }) {
+export function DepartmentsModule({ role, departments, employees = [], currentUser }) {
   const [deptList, setDeptList] = useState(() => {
     const saved = localStorage.getItem("peoplepulse_departments");
     return saved ? JSON.parse(saved) : departments;
@@ -38,6 +38,14 @@ export function DepartmentsModule({ role, departments, currentUser }) {
     avgExp: "3.5 Years",
     projects: 4,
   });
+
+  const getDeptEmployeeCount = (deptName) => {
+    if (!employees || employees.length === 0) return null;
+    const matchCount = employees.filter(
+      (e) => (e.department || "").toLowerCase().trim() === deptName.toLowerCase().trim()
+    ).length;
+    return matchCount;
+  };
 
   const handleLoadMore = () => {
     setDeptList([...deptList, ...EXTRA_DEPARTMENTS]);
@@ -101,7 +109,7 @@ export function DepartmentsModule({ role, departments, currentUser }) {
   };
 
   const handleDeleteDept = (deptName) => {
-    if (!isManagerOrAdmin) return;
+    if (role !== "Admin") return;
     const updated = deptList.filter((d) => d.name !== deptName);
     setDeptList(updated);
     setNotification(`Deleted department "${deptName}"`);
@@ -111,11 +119,11 @@ export function DepartmentsModule({ role, departments, currentUser }) {
   return (
     <>
       <SectionTitle
-        title={role === "Manager" ? `My Department — ${currentUser?.department || "Engineering"}` : "Department Structure"}
+        title="Departments Overview"
         action={
           role === "Admin" ? (
             <button className="nf-btn primary" onClick={() => setShowAddModal(true)}>
-              <Plus size={14} /> Add department
+              <Plus size={14} /> Add Department
             </button>
           ) : null
         }
@@ -184,47 +192,52 @@ export function DepartmentsModule({ role, departments, currentUser }) {
       )}
 
       <div className="nf-grid-3">
-        {displayDepartments.map((d) => (
-          <Card key={d.name}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
-              <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                <div className="nf-avatar sm" style={{ background: "#2F8F8226", color: "#2F8F82" }}>
-                  <Building2 size={16} />
+        {displayDepartments.map((d) => {
+          const liveCount = getDeptEmployeeCount(d.name);
+          const displayCount = liveCount !== null ? liveCount : d.count;
+
+          return (
+            <Card key={d.name}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
+                <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                  <div className="nf-avatar sm" style={{ background: "#2F8F8226", color: "#2F8F82" }}>
+                    <Building2 size={16} />
+                  </div>
+                  <div>
+                    <h3 className="nf-h3" style={{ margin: 0 }}>{d.name}</h3>
+                    <div style={{ fontSize: 12, color: "var(--ink-dim)" }}>Head: {d.head}</div>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="nf-h3" style={{ margin: 0 }}>{d.name}</h3>
-                  <div style={{ fontSize: 12, color: "var(--ink-dim)" }}>Head: {d.head}</div>
-                </div>
+
+                {role === "Admin" && (
+                  <div style={{ display: "flex", gap: 4 }}>
+                    <button className="nf-btn ghost sm" style={{ padding: "4px 8px" }} title="Edit Dept" onClick={() => handleOpenEdit(d)}>
+                      <Edit3 size={12} />
+                    </button>
+                    <button className="nf-btn ghost sm danger" style={{ padding: "4px 8px" }} title="Delete Dept" onClick={() => handleDeleteDept(d.name)}>
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                )}
               </div>
 
-              {role === "Admin" && (
-                <div style={{ display: "flex", gap: 4 }}>
-                  <button className="nf-btn ghost sm" style={{ padding: "4px 8px" }} title="Edit Dept" onClick={() => handleOpenEdit(d)}>
-                    <Edit3 size={12} />
-                  </button>
-                  <button className="nf-btn ghost sm danger" style={{ padding: "4px 8px" }} title="Delete Dept" onClick={() => handleDeleteDept(d.name)}>
-                    <Trash2 size={12} />
-                  </button>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginTop: 14 }}>
+                <div style={{ background: "var(--surface-alt)", padding: "8px", borderRadius: 8, textAlign: "center" }}>
+                  <div style={{ fontSize: 10.5, color: "var(--ink-dim)" }}>Employees</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2, color: "#E8A33D" }}>{displayCount}</div>
                 </div>
-              )}
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginTop: 14 }}>
-              <div style={{ background: "var(--surface-alt)", padding: "8px", borderRadius: 8, textAlign: "center" }}>
-                <div style={{ fontSize: 10.5, color: "var(--ink-dim)" }}>Employees</div>
-                <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2 }}>{d.count}</div>
+                <div style={{ background: "var(--surface-alt)", padding: "8px", borderRadius: 8, textAlign: "center" }}>
+                  <div style={{ fontSize: 10.5, color: "var(--ink-dim)" }}>Avg Exp</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, marginTop: 4 }}>{d.avgExp}</div>
+                </div>
+                <div style={{ background: "var(--surface-alt)", padding: "8px", borderRadius: 8, textAlign: "center" }}>
+                  <div style={{ fontSize: 10.5, color: "var(--ink-dim)" }}>Projects</div>
+                  <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2, color: "#2F8F82" }}>{d.projects}</div>
+                </div>
               </div>
-              <div style={{ background: "var(--surface-alt)", padding: "8px", borderRadius: 8, textAlign: "center" }}>
-                <div style={{ fontSize: 10.5, color: "var(--ink-dim)" }}>Avg Exp</div>
-                <div style={{ fontSize: 13, fontWeight: 700, marginTop: 4 }}>{d.avgExp}</div>
-              </div>
-              <div style={{ background: "var(--surface-alt)", padding: "8px", borderRadius: 8, textAlign: "center" }}>
-                <div style={{ fontSize: 10.5, color: "var(--ink-dim)" }}>Projects</div>
-                <div style={{ fontSize: 15, fontWeight: 700, marginTop: 2, color: "#2F8F82" }}>{d.projects}</div>
-              </div>
-            </div>
-          </Card>
-        ))}
+            </Card>
+          );
+        })}
       </div>
 
       {role === "Admin" && !hasLoadedMore && (

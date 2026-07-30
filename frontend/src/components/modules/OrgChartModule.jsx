@@ -40,10 +40,15 @@ export function OrgChartModule({ role, employees = [] }) {
         let defaultReports = null;
         if (roleStr.includes("Head") || roleStr.includes("CEO") || emp.name === "Aman Verma") {
           defaultReports = null;
-        } else if (roleStr.includes("Manager") || roleStr.includes("Lead") || emp.name === "Rahul Sharma" || emp.name === "Priya Nair") {
+        } else if (emp.role === "Manager" || roleStr.includes("Manager") || roleStr.includes("Director")) {
           defaultReports = "Aman Verma";
         } else {
-          defaultReports = emp.department === "Product" ? "Priya Nair" : "Rahul Sharma";
+          if (emp.department === "Engineering") defaultReports = "Rahul Sharma";
+          else if (emp.department === "Product") defaultReports = "Priya Nair";
+          else if (emp.department === "HR") defaultReports = "Sneha Gupta";
+          else if (emp.department === "Finance") defaultReports = "Rohan Kapoor";
+          else if (emp.department === "Marketing") defaultReports = "Ananya Sen";
+          else defaultReports = "Rahul Sharma";
         }
         return {
           id: emp._id || emp.id || emp.empId,

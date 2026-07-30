@@ -428,7 +428,7 @@ export function DashboardPage({ role, onLogout }) {
   } else if (currentPage === "leave") {
     pageContent = <LeaveModule role={role} leaveRequests={leaveRequests} onUpdateStatus={handleUpdateLeaveStatus} onApplyLeave={handleApplyLeave} onDeleteLeave={handleDeleteLeaveRequest} currentUser={loggedInUser} />;
   } else if (currentPage === "departments") {
-    pageContent = <DepartmentsModule role={role} departments={DEPARTMENTS_DATA} currentUser={loggedInUser} />;
+    pageContent = <DepartmentsModule role={role} departments={DEPARTMENTS_DATA} employees={employeesList} currentUser={loggedInUser} />;
   } else if (currentPage === "tasks") {
     pageContent = <TasksModule role={role} employees={employeesList} currentUser={loggedInUser} />;
   } else if (currentPage === "performance") {
