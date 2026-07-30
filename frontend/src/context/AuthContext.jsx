@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user_info", JSON.stringify(userObj));
       return userObj;
     } catch (err) {
-      // Throw error to block login if user is not authorized in MongoDB database
       throw err;
     }
   };

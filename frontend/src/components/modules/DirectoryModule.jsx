@@ -101,7 +101,7 @@ export function DirectoryModule({
         </div>
       )}
 
-      {/* Admin Pending Registration Approvals Section */}
+      {}
       {isManagerOrAdmin && pendingUsers && pendingUsers.length > 0 && (
         <Card style={{ marginBottom: 24, border: "1px solid #E8A33D66", background: "rgba(232, 163, 61, 0.05)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
@@ -167,7 +167,7 @@ export function DirectoryModule({
         </Card>
       )}
 
-      {/* Add Employee Modal */}
+      {}
       {showAddModal && isManagerOrAdmin && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 460, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -206,7 +206,7 @@ export function DirectoryModule({
         </div>
       )}
 
-      {/* Filter and Search Controls */}
+      {}
       <div style={{ display: "flex", gap: 12, marginBottom: 20, flexWrap: "wrap" }}>
         <div className="nf-search" style={{ flex: 1, minWidth: 260 }}>
           <Search size={16} />
@@ -229,7 +229,7 @@ export function DirectoryModule({
         </select>
       </div>
 
-      {/* Employee Cards Grid */}
+      {}
       <div className="nf-grid-3" style={{ gap: 24, marginTop: 24 }}>
         {filteredEmployees.map((emp) => (
           <div key={emp.id || emp.empId} style={{ position: "relative" }}>

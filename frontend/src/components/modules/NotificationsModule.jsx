@@ -39,7 +39,6 @@ export function NotificationsModule({ role, currentUser, onApprovePending, onRej
     localStorage.setItem("peoplepulse_notifications", JSON.stringify(rawNotifs));
   }, [rawNotifs]);
 
-  // Filter notifications strictly by recipient & department for ALL users
   const notifications = rawNotifs.filter((n) => {
     if (n.department) {
       if (n.department === "All Departments" || n.department === "All") return true;
@@ -167,7 +166,7 @@ export function NotificationsModule({ role, currentUser, onApprovePending, onRej
                     <Clock size={11} /> {formatRelativeTime(item.createdAt || item.timestamp || item.time)}
                   </div>
 
-                  {/* ADMIN APPROVE / REJECT ACCESS REQUEST BUTTONS */}
+                  {}
                   {role === "Admin" && item.accessRequest && !item.status && (
                     <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
                       <button className="nf-btn primary sm" onClick={() => handleApproveAccess(item)}>

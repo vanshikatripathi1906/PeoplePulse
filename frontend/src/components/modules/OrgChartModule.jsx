@@ -8,7 +8,6 @@ export function OrgChartModule({ role, employees = [], currentUser }) {
   const isAdmin = role === "Admin";
   const isManager = role === "Manager";
 
-  // Active workforce (50 employees total: 5 Managers + 45 Employees)
   const validEmployees = (employees && employees.length > 0)
     ? employees.filter((e) => e.name !== "Aman Verma" || isAdmin)
     : [];
@@ -30,7 +29,7 @@ export function OrgChartModule({ role, employees = [], currentUser }) {
     <>
       <SectionTitle title="Organizational Hierarchy &amp; Department Structure" />
 
-      {/* EXECUTIVE HEAD (AMAN VERMA) TOP CARD FOR ALL ROLES */}
+      {}
       <Card style={{ marginBottom: 24, padding: 20, textAlign: "center", background: "var(--surface)" }}>
         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "var(--ink-dim)", textTransform: "uppercase", marginBottom: 12 }}>
           Executive Leadership &amp; Administration
@@ -57,7 +56,7 @@ export function OrgChartModule({ role, employees = [], currentUser }) {
           <span>Showing 5 Department Managers and 10 Team Members reporting to each Manager</span>
         </div>
 
-        {/* GRID OF 5 DEPARTMENTS (1 MANAGER + 10 EMPLOYEES EACH) */}
+        {}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
           {displayManagers.map((mgr) => {
             const deptEmployees = validEmployees.filter(
@@ -78,7 +77,7 @@ export function OrgChartModule({ role, employees = [], currentUser }) {
                   gap: 10,
                 }}
               >
-                {/* MANAGER CARD HEADER */}
+                {}
                 <div
                   style={{
                     background: `${color}18`,
@@ -106,7 +105,7 @@ export function OrgChartModule({ role, employees = [], currentUser }) {
                   Reporting Employees ({deptEmployees.length || 10})
                 </div>
 
-                {/* EMPLOYEES REPORTING TO THIS MANAGER */}
+                {}
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {deptEmployees.map((emp) => (
                     <div

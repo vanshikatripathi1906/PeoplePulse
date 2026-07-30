@@ -31,7 +31,6 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
   const isManager = role === "Manager";
   const isEmployee = role === "Employee";
 
-  // Filter performance list strictly by excluding Admin (Aman Verma)
   let displayEmployees = (employees || []).filter(
     (e) => e.role !== "Admin" && e.name !== "Aman Verma"
   );
@@ -91,7 +90,6 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
       await updateEmployeeAPI(targetId, updatedEmp);
     } catch (err) {}
 
-    // Send notification to employee
     try {
       const savedNotifs = localStorage.getItem("peoplepulse_notifications");
       const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];

@@ -59,7 +59,6 @@ export function AssetsModule({ role, employees }) {
       status: "Assigned",
     };
 
-    // Dispatch notification to recipient employee
     try {
       const savedNotifs = localStorage.getItem("peoplepulse_notifications");
       const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];

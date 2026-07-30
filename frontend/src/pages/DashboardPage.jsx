@@ -98,7 +98,6 @@ export function DashboardPage({ role, onLogout }) {
   const [pendingUsers, setPendingUsers] = useState([]);
   const [employeesList, setEmployeesList] = useState(INITIAL_EMPLOYEES_DATA);
 
-  // Synchronize live employee data directly from backend MongoDB Atlas database
   useEffect(() => {
     const loadDBEmployees = async () => {
       try {
@@ -127,7 +126,6 @@ export function DashboardPage({ role, onLogout }) {
     loadDBEmployees();
   }, []);
 
-  // Synchronize pending employee access requests from backend MongoDB
   useEffect(() => {
     const loadPending = async () => {
       try {

@@ -293,7 +293,7 @@ export function AttendanceModule({ role, employees }) {
         </div>
       </Card>
 
-      {/* ADMIN ATTENDANCE BREAKDOWN FOR ALL WORKFORCE (MANAGERS & EMPLOYEES) */}
+      {}
       {role === "Admin" && (
         <Card style={{ marginTop: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>

@@ -42,7 +42,6 @@ export function formatEventDateLabel(dateStr, fallbackDayStr) {
   const diffDays = Math.round(diffTime / (1000 * 3600 * 24));
 
   if (diffDays < 0) {
-    // Event date has passed -> Expired!
     return null;
   }
 
@@ -111,7 +110,6 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
 
   const [notification, setNotification] = useState(null);
 
-  // Modals
   const [showEventModal, setShowEventModal] = useState(false);
   const [eventForm, setEventForm] = useState({ title: "", date: "2026-07-30", time: "03:00 PM", tag: "All Hands Meeting" });
   const [modalType, setModalType] = useState(null);
@@ -119,7 +117,6 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
   const safeTotal = employees.length > 0 ? employees.length : metrics.totalEmployees;
   const safeApprovedLeave = leaveRequests.filter((r) => r.status === "Approved").length;
 
-  // Filter active future upcoming events only (expired past events automatically removed)
   const activeUpcomingEvents = eventsList.filter((ev) => {
     if (ev.date) {
       const today = new Date();
@@ -127,13 +124,12 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
       const evDate = new Date(ev.date);
       evDate.setHours(0, 0, 0, 0);
       if (evDate.getTime() < today.getTime()) {
-        return false; // Expired event date -> automatically remove from list!
+        return false; 
       }
     }
     return true;
   });
 
-  // DYNAMIC DEPARTMENT-WISE TOP PERFORMERS & RANKINGS FROM MONGODB ATLAS
   const allScoredEmployees = (employees && employees.length > 0)
     ? employees
         .filter((emp) => emp.role !== "Admin" && emp.name !== "Aman Verma")
@@ -157,7 +153,6 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
         })
     : DEFAULT_TOP_PERFORMERS;
 
-  // Filter department top performers for Employee & Manager view
   const deptRankedList = [...allScoredEmployees]
     .filter((e) => !userDept || (e.department || "").toLowerCase() === userDept.toLowerCase())
     .sort((a, b) => b.score - a.score);
@@ -165,7 +160,6 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
   const displayPerformers = deptRankedList.length > 0 ? deptRankedList.slice(0, 5) : allScoredEmployees.sort((a, b) => b.score - a.score).slice(0, 5);
   const employeeOfTheMonth = deptRankedList[0] || allScoredEmployees[0] || DEFAULT_TOP_PERFORMERS[0];
 
-  // Calculate current logged in user's rank inside their department
   const userIndexInDept = deptRankedList.findIndex(
     (e) => (currentUser?.email && e.email?.toLowerCase() === currentUser.email.toLowerCase()) ||
            (currentUser?.name && e.name?.toLowerCase() === currentUser.name.toLowerCase()) ||
@@ -242,7 +236,6 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
     setShowEventModal(false);
     setEventForm({ title: "", date: "2026-07-30", time: "03:00 PM", tag: "General" });
 
-    // Send Notification to department workforce
     try {
       const savedNotifs = localStorage.getItem("peoplepulse_notifications");
       const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];
@@ -272,7 +265,6 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Helper Component: Upcoming Events Card
   const UpcomingEventsCard = () => (
     <Card>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
@@ -292,7 +284,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {activeUpcomingEvents.map((ev) => {
           const dateLabel = formatEventDateLabel(ev.date, ev.day);
-          if (!dateLabel) return null; // Past expired event!
+          if (!dateLabel) return null; 
 
           return (
             <div
@@ -337,7 +329,6 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
     </Card>
   );
 
-  // Helper Component: Top Performers Card (Department-Wise)
   const TopPerformersCard = () => (
     <Card>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
@@ -384,7 +375,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
         </div>
       </div>
 
-      {/* Logged in User Department Rank Banner */}
+      {}
       {userDeptRank && (
         <div
           style={{
@@ -473,7 +464,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
         </div>
       )}
 
-      {/* Schedule Event Modal - ACCESSIBLE TO MANAGER ONLY */}
+      {}
       {showEventModal && isManager && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div className="nf-card" style={{ maxWidth: 440, width: "100%", margin: "auto", background: "var(--surface)" }}>
@@ -514,12 +505,12 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
         </div>
       )}
 
-      {/* ROLE SPECIFIC DASHBOARD VIEWS */}
+      {}
 
-      {/* 1. MANAGER DASHBOARD: SHOWS MY DEPARTMENT TEAM & UPCOMING EVENTS */}
+      {}
       {isManager && (
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          {/* MY DEPARTMENT TEAM CARD FOR LOGGED-IN MANAGER */}
+          {}
           <Card>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -576,7 +567,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
         </div>
       )}
 
-      {/* 2. EMPLOYEE DASHBOARD: SHOWS UPCOMING EVENTS & TOP PERFORMERS ONLY */}
+      {}
       {isEmployee && (
         <div className="nf-grid-2" style={{ marginBottom: 28 }}>
           <UpcomingEventsCard />
@@ -584,7 +575,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
         </div>
       )}
 
-      {/* 3. ADMIN DASHBOARD: FULL COMPREHENSIVE VIEW */}
+      {}
       {isAdmin && (
         <>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 28 }}>

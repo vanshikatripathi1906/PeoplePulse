@@ -38,7 +38,6 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
     return matchCount || 10;
   };
 
-  // Filter department cards: show ONLY active departments where employees are working
   const activeWorkingDepartments = (
     role === "Manager" && currentUser?.department
       ? deptList.filter((d) => d.name.toLowerCase() === currentUser.department.toLowerCase() || d.name === "Engineering")
@@ -107,7 +106,6 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
     setTimeout(() => setNotification(null), 3000);
   };
 
-  // Extract the 5 primary Department Managers (1 per department)
   const departmentManagers = [
     { name: "Rahul Sharma", designation: "Senior Engineering Manager", department: "Engineering", email: "managerpeoplepulse@gmail.com" },
     { name: "Priya Nair", designation: "Product Head", department: "Product", email: "priya.nair@peoplepulse.co" },
@@ -135,7 +133,7 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
         </div>
       )}
 
-      {/* DEPARTMENT MANAGERS CARD IN DEPARTMENT SECTION */}
+      {}
       <Card style={{ marginBottom: 24, overflowX: "auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -217,7 +215,7 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
         </div>
       )}
 
-      {/* DEPARTMENT CARDS GRID - 5 ACTIVE DEPARTMENTS */}
+      {}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
         {activeWorkingDepartments.map((d) => {
           const liveCount = getDeptEmployeeCount(d.name);

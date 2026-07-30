@@ -17,7 +17,6 @@ function MonthlyAttendanceView({ empName, emp }) {
   let baseWfh = attArr.length > 0 ? attArr.filter((a) => a === "WFH").length : 3;
   let baseLeave = attArr.length > 0 ? attArr.filter((a) => a === "L" || a === "Leave").length : 1;
 
-  // Sync live check-in marked in Attendance module today
   const todayCheck = localStorage.getItem(`peoplepulse_checkin_${todayISO}`) || localStorage.getItem(`peoplepulse_attendance_marked_${todayISO}`);
   if (todayCheck) {
     try {

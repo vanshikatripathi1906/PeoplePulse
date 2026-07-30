@@ -41,7 +41,6 @@ export function TasksModule({ role, employees = [], currentUser }) {
   const isManagerOrAdmin = role === "Manager" || role === "Admin";
   const isEmployee = role === "Employee";
 
-  // Filter employees for Manager: show department employees
   const assignableEmployees = role === "Manager" && currentUser?.department
     ? employees.filter((e) => e.department?.toLowerCase() === currentUser.department?.toLowerCase())
     : employees;
@@ -65,7 +64,6 @@ export function TasksModule({ role, employees = [], currentUser }) {
 
   const cols = Object.keys(board);
 
-  // Scoped board for Employee role: show ONLY tasks assigned to the logged-in employee
   const displayBoard = {};
   const currentEmpName = (currentUser?.name || "Vanshika Tripathi").toLowerCase();
 
@@ -114,7 +112,6 @@ export function TasksModule({ role, employees = [], currentUser }) {
       "To Do": [newTask, ...prev["To Do"]],
     }));
 
-    // Trigger notification to assignee
     try {
       const savedNotifs = localStorage.getItem("peoplepulse_notifications");
       const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];

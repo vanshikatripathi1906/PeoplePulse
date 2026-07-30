@@ -5,19 +5,14 @@ import { registerUserAPI } from "../services/api";
 
 export function LoginPage({ onLogin }) {
   const { dark, toggleTheme } = useTheme();
-  const [mode, setMode] = useState("signin"); // "signin" or "register"
-  
-  // Sign-in states
+  const [mode, setMode] = useState("signin"); 
   const [email, setEmail] = useState("vanshikapeoplepulse@gmail.com");
   const [password, setPassword] = useState("••••••••");
-  
-  // Registration states
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
   const [regDesignation, setRegDesignation] = useState("Frontend Developer");
   const [regDepartment, setRegDepartment] = useState("Engineering");
-  
   const [statusMessage, setStatusMessage] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,7 +21,6 @@ export function LoginPage({ onLogin }) {
     e.preventDefault();
     setErrorMessage(null);
     setStatusMessage(null);
-    
     if (mode === "signin") {
       try {
         await onLogin("Employee", { email, password });
@@ -45,7 +39,6 @@ export function LoginPage({ onLogin }) {
           role: "Employee",
         });
 
-        // Dispatch access request notification directly to Admin
         try {
           const savedNotifs = localStorage.getItem("peoplepulse_notifications");
           const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];
@@ -111,7 +104,7 @@ export function LoginPage({ onLogin }) {
           Empowering smarter workforce engagement
         </p>
 
-        {/* Mode Switcher Tabs */}
+        {}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, background: "var(--surface-alt)", padding: 4, borderRadius: 10, marginBottom: 20 }}>
           <button
             type="button"

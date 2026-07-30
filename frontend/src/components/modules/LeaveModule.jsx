@@ -16,7 +16,6 @@ export function LeaveModule({ role, leaveRequests, onUpdateStatus, onApplyLeave,
   const allReqs = leaveRequests || LEAVE_REQUESTS_DEFAULT;
   const [notification, setNotification] = useState(null);
 
-  // Filter requests for Employee role: show ONLY requests filed by the logged-in employee
   const reqs = role === "Employee" && currentUser?.name
     ? allReqs.filter((r) => r.employee.toLowerCase() === currentUser.name.toLowerCase())
     : allReqs;
