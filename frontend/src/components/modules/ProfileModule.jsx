@@ -54,7 +54,7 @@ function MonthlyAttendanceView({ empName }) {
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 20 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
         <div style={{ background: "var(--surface-alt)", padding: "12px 14px", borderRadius: 10, textAlign: "center" }}>
           <div style={{ fontSize: 11, color: "var(--ink-dim)", textTransform: "uppercase", fontWeight: 700 }}>Present Days</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: "#2F8F82", marginTop: 4 }}>{presentDays}</div>
@@ -71,41 +71,6 @@ function MonthlyAttendanceView({ empName }) {
           <div style={{ fontSize: 11, color: "var(--ink-dim)", textTransform: "uppercase", fontWeight: 700 }}>Working Days</div>
           <div style={{ fontSize: 22, fontWeight: 700, color: "var(--accent-2)", marginTop: 4 }}>{totalWorkingDays}</div>
         </div>
-      </div>
-
-      <div style={{ fontSize: 12, fontWeight: 700, color: "var(--ink-dim)", marginBottom: 10, textTransform: "uppercase" }}>
-        July 2026 Daily Attendance Grid
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 8 }}>
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((dayName) => (
-          <div key={dayName} style={{ textAlign: "center", fontSize: 11, fontWeight: 700, color: "var(--ink-dim)", paddingBottom: 4 }}>
-            {dayName}
-          </div>
-        ))}
-        {calendarGrid.map((item) => {
-          let bg = "rgba(47,143,130,0.12)";
-          let border = "#2F8F82";
-          let color = "#2F8F82";
-          if (item.status === "Weekend") { bg = "var(--surface-alt)"; border = "var(--border)"; color = "var(--ink-dim)"; }
-          else if (item.status === "On Leave" || item.status === "Leave") { bg = "rgba(232,163,61,0.12)"; border = "#E8A33D"; color = "#E8A33D"; }
-          else if (item.status === "WFH") { bg = "rgba(56,189,248,0.12)"; border = "#38BDF8"; color = "#38BDF8"; }
-
-          return (
-            <div
-              key={item.dayNum}
-              style={{
-                background: bg,
-                border: `1px solid ${border}`,
-                borderRadius: 8,
-                padding: "8px 6px",
-                textAlign: "center",
-              }}
-            >
-              <div style={{ fontSize: 12, fontWeight: 700, color }}>{item.dayNum}</div>
-              <div style={{ fontSize: 9.5, fontWeight: 600, color, marginTop: 2 }}>{item.status}</div>
-            </div>
-          );
-        })}
       </div>
     </Card>
   );
