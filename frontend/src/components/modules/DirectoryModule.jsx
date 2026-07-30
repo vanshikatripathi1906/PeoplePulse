@@ -31,14 +31,16 @@ export function DirectoryModule({
     phone: "+91 98000 12345",
   });
 
-  const filteredEmployees = (employees || []).filter((emp) => {
-    const matchesSearch =
-      emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.empId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      emp.designation.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDept = selectedDept === "all" || emp.department.toLowerCase() === selectedDept.toLowerCase();
-    return matchesSearch && matchesDept;
-  });
+  const filteredEmployees = (employees || [])
+    .filter((emp) => emp.role !== "Admin" && emp.name !== "Aman Verma")
+    .filter((emp) => {
+      const matchesSearch =
+        emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        emp.empId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        emp.designation.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesDept = selectedDept === "all" || emp.department.toLowerCase() === selectedDept.toLowerCase();
+      return matchesSearch && matchesDept;
+    });
 
   const handleAddSubmit = (e) => {
     e.preventDefault();

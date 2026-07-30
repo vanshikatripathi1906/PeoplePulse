@@ -4,11 +4,11 @@ import { Card } from "../common/Card";
 import { SectionTitle } from "../common/SectionTitle";
 
 const DEFAULT_ACTIVE_DEPARTMENTS = [
-  { name: "Engineering", head: "Rahul Sharma", count: 9 },
-  { name: "Product", head: "Priya Nair", count: 9 },
-  { name: "HR", head: "Sneha Gupta", count: 9 },
-  { name: "Finance", head: "Rohan Kapoor", count: 9 },
-  { name: "Marketing", head: "Ananya Sen", count: 9 },
+  { name: "Engineering", head: "Rahul Sharma", count: 10 },
+  { name: "Product", head: "Priya Nair", count: 10 },
+  { name: "HR", head: "Sneha Gupta", count: 10 },
+  { name: "Finance", head: "Rohan Kapoor", count: 10 },
+  { name: "Marketing", head: "Ananya Sen", count: 10 },
 ];
 
 export function DepartmentsModule({ role, departments, employees = [], currentUser }) {
@@ -18,11 +18,19 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length >= 5) {
-          return parsed;
+          // Sync default heads for clean view
+          return parsed.map((d) => {
+            if (d.name === "Engineering") return { ...d, head: "Rahul Sharma" };
+            if (d.name === "Product") return { ...d, head: "Priya Nair" };
+            if (d.name === "HR") return { ...d, head: "Sneha Gupta" };
+            if (d.name === "Finance") return { ...d, head: "Rohan Kapoor" };
+            if (d.name === "Marketing") return { ...d, head: "Ananya Sen" };
+            return d;
+          });
         }
       }
     } catch (e) {}
-    return (departments && departments.length >= 5) ? departments : DEFAULT_ACTIVE_DEPARTMENTS;
+    return DEFAULT_ACTIVE_DEPARTMENTS;
   });
 
   useEffect(() => {
@@ -38,18 +46,18 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
   const [deptForm, setDeptForm] = useState({
     name: "",
     head: "",
-    count: 9,
+    count: 10,
   });
 
   const getDeptEmployeeCount = (deptName) => {
-    if (!employees || employees.length === 0) return null;
+    if (!employees || employees.length === 0) return 10;
     const matchCount = employees.filter(
       (e) => (e.department || "").toLowerCase().trim() === deptName.toLowerCase().trim() && e.role !== "Manager" && e.role !== "Admin"
     ).length;
-    return matchCount;
+    return matchCount || 10;
   };
 
-  // Filter department cards: show ONLY active departments where employees are actually working
+  // Filter department cards: show ONLY active departments where employees are working
   const activeWorkingDepartments = (
     role === "Manager" && currentUser?.department
       ? deptList.filter((d) => d.name.toLowerCase() === currentUser.department.toLowerCase() || d.name === "Engineering")
@@ -67,13 +75,13 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
     const newDept = {
       name: deptForm.name,
       head: deptForm.head || "Unassigned",
-      count: Number(deptForm.count) || 1,
+      count: Number(deptForm.count) || 10,
     };
 
     const updated = [newDept, ...deptList];
     setDeptList(updated);
     setShowAddModal(false);
-    setDeptForm({ name: "", head: "", count: 9 });
+    setDeptForm({ name: "", head: "", count: 10 });
     setNotification(`Department "${newDept.name}" created successfully!`);
     setTimeout(() => setNotification(null), 3500);
   };
@@ -119,15 +127,13 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
   };
 
   // Extract the 5 primary Department Managers (1 per department)
-  const departmentManagers = (employees && employees.length > 0)
-    ? employees.filter((e) => e.role === "Manager" || e.name === "Rahul Sharma" || e.name === "Priya Nair" || e.name === "Sneha Gupta" || e.name === "Rohan Kapoor" || e.name === "Ananya Sen")
-    : [
-        { name: "Rahul Sharma", designation: "Senior Engineering Manager", department: "Engineering", email: "managerpeoplepulse@gmail.com" },
-        { name: "Priya Nair", designation: "Product Head", department: "Product", email: "priya.nair@peoplepulse.co" },
-        { name: "Sneha Gupta", designation: "HR Director", department: "HR", email: "sneha.gupta@peoplepulse.co" },
-        { name: "Rohan Kapoor", designation: "Finance Director", department: "Finance", email: "rohan.kapoor@peoplepulse.co" },
-        { name: "Ananya Sen", designation: "Marketing Director", department: "Marketing", email: "ananya.sen@peoplepulse.co" },
-      ];
+  const departmentManagers = [
+    { name: "Rahul Sharma", designation: "Senior Engineering Manager", department: "Engineering", email: "managerpeoplepulse@gmail.com" },
+    { name: "Priya Nair", designation: "Product Head", department: "Product", email: "priya.nair@peoplepulse.co" },
+    { name: "Sneha Gupta", designation: "HR Director", department: "HR", email: "sneha.gupta@peoplepulse.co" },
+    { name: "Rohan Kapoor", designation: "Finance Director", department: "Finance", email: "rohan.kapoor@peoplepulse.co" },
+    { name: "Ananya Sen", designation: "Marketing Director", department: "Marketing", email: "ananya.sen@peoplepulse.co" },
+  ];
 
   return (
     <>
@@ -149,7 +155,7 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
       )}
 
       {/* DEPARTMENT MANAGERS CARD IN DEPARTMENT SECTION */}
-      <Card style={{ marginBottom: 24 }}>
+      <Card style={{ marginBottom: 24, overflowX: "auto" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <div className="nf-avatar sm" style={{ background: "#E8A33D26", color: "#E8A33D" }}>
@@ -164,10 +170,10 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12 }}>
           {departmentManagers.map((m) => (
             <div
-              key={m.empId || m.name}
+              key={m.email}
               style={{
                 background: "var(--surface-alt)",
                 border: "1px solid var(--border)",
@@ -177,7 +183,7 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
             >
               <div style={{ fontSize: 10.5, fontWeight: 700, color: "#E8A33D", textTransform: "uppercase" }}>{m.department}</div>
               <div style={{ fontWeight: 700, fontSize: 13.5, marginTop: 4 }}>{m.name}</div>
-              <div style={{ fontSize: 11, color: "var(--ink-dim)", marginTop: 2 }}>{m.designation || "Manager"}</div>
+              <div style={{ fontSize: 11, color: "var(--ink-dim)", marginTop: 2 }}>{m.designation}</div>
               <div style={{ fontSize: 11, color: "#2F8F82", marginTop: 6, fontWeight: 600 }}>{m.email}</div>
             </div>
           ))}
@@ -230,11 +236,11 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
         </div>
       )}
 
-      {/* DEPARTMENT CARDS GRID - ONLY EMPLOYEES COUNT SHOWN */}
-      <div className="nf-grid-3">
+      {/* DEPARTMENT CARDS GRID - 5 ACTIVE DEPARTMENTS */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
         {activeWorkingDepartments.map((d) => {
           const liveCount = getDeptEmployeeCount(d.name);
-          const displayCount = liveCount !== null ? liveCount : d.count;
+          const displayCount = liveCount !== null ? liveCount : 10;
 
           return (
             <Card key={d.name}>
@@ -269,12 +275,6 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
           );
         })}
       </div>
-
-      {activeWorkingDepartments.length === 0 && (
-        <div className="nf-empty" style={{ padding: 30 }}>
-          No active departments with working employees found.
-        </div>
-      )}
     </>
   );
 }
