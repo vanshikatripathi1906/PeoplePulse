@@ -173,12 +173,12 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
 
   const totalManagers = employees.filter((e) => e.role === "Manager").length || 5;
   const totalEmployeesOnly = employees.filter((e) => e.role === "Employee").length || 45;
-  const totalWorkforceNoAdmin = 50;
+  const totalWorkforce = 50;
 
   const stats = [
     {
       label: "TOTAL WORKFORCE",
-      value: totalWorkforceNoAdmin.toString(),
+      value: totalWorkforce.toString(),
       sub: `${totalManagers} Managers · ${totalEmployeesOnly} Employees`,
       icon: Users,
       accent: "#E8A33D",
