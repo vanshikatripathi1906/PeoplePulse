@@ -12,26 +12,7 @@ const DEFAULT_ACTIVE_DEPARTMENTS = [
 ];
 
 export function DepartmentsModule({ role, departments, employees = [], currentUser }) {
-  const [deptList, setDeptList] = useState(() => {
-    try {
-      const saved = localStorage.getItem("peoplepulse_departments");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length >= 5) {
-          // Sync default heads for clean view
-          return parsed.map((d) => {
-            if (d.name === "Engineering") return { ...d, head: "Rahul Sharma" };
-            if (d.name === "Product") return { ...d, head: "Priya Nair" };
-            if (d.name === "HR") return { ...d, head: "Sneha Gupta" };
-            if (d.name === "Finance") return { ...d, head: "Rohan Kapoor" };
-            if (d.name === "Marketing") return { ...d, head: "Ananya Sen" };
-            return d;
-          });
-        }
-      }
-    } catch (e) {}
-    return DEFAULT_ACTIVE_DEPARTMENTS;
-  });
+  const [deptList, setDeptList] = useState(DEFAULT_ACTIVE_DEPARTMENTS);
 
   useEffect(() => {
     localStorage.setItem("peoplepulse_departments", JSON.stringify(deptList));

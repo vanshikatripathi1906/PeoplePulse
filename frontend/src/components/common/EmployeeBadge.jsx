@@ -38,20 +38,8 @@ export function EmployeeBadge({ emp, onClick }) {
           </div>
         </div>
 
-        <div style={{ marginTop: 10, fontSize: 12.5, fontWeight: 700, fontFamily: "'Inter', sans-serif", color: "var(--ink-dim)" }}>{emp.empId}</div>
-
-        <div className="nf-badge-row" style={{ fontSize: 12.5, marginTop: 4 }}>
-          <span>🏢 {emp.department}</span>
-        </div>
-        <div className="nf-badge-row" style={{ fontSize: 12.5, marginTop: 2 }}>
-          <span>💼 {emp.experience}</span>
-        </div>
-        <div className="nf-badge-row" style={{ fontSize: 12.5, marginTop: 2 }}>
-          <span>👤 Reports to {emp.manager}</span>
-        </div>
-
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
-          <Pill tone={emp.status === "Active" ? "good" : "warn"}>{emp.status}</Pill>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14, paddingTop: 10, borderTop: "1px solid var(--border)" }}>
+          <Pill tone={emp.status === "Active" ? "good" : "warn"}>{emp.status || "ACTIVE"}</Pill>
           {onClick && (
             <button className="nf-btn ghost sm" onClick={onClick} style={{ padding: "4px 10px", fontSize: 12, gap: 3 }}>
               View profile <ChevronRight size={13} />
