@@ -9,34 +9,30 @@ import { Pill } from "../common/Pill";
 import { AttendanceStrip, STATUS_LABEL, STATUS_COLOR } from "../common/AttendanceStrip";
 import { DEPT_COLORS } from "../common/EmployeeBadge";
 
-function MonthlyAttendanceView({ empName }) {
+function MonthlyAttendanceView({ empName, emp }) {
   const todayISO = new Date().toISOString().slice(0, 10);
-  const [records] = useState(() => {
+
+  const attArr = emp?.attendance || [];
+  let basePresent = attArr.length > 0 ? attArr.filter((a) => a === "P").length : 21;
+  let baseWfh = attArr.length > 0 ? attArr.filter((a) => a === "WFH").length : 3;
+  let baseLeave = attArr.length > 0 ? attArr.filter((a) => a === "L" || a === "Leave").length : 1;
+
+  // Sync live check-in marked in Attendance module today
+  const todayCheck = localStorage.getItem(`peoplepulse_checkin_${todayISO}`) || localStorage.getItem(`peoplepulse_attendance_marked_${todayISO}`);
+  if (todayCheck) {
     try {
-      const saved = localStorage.getItem("peoplepulse_attendance_records");
-      const list = saved ? JSON.parse(saved) : [];
-      const todayCheck = localStorage.getItem(`peoplepulse_checkin_${todayISO}`);
-      if (todayCheck) {
-        const parsed = JSON.parse(todayCheck);
-        if (parsed.checkedIn || parsed.checkInTime) {
-          list.push({ employee: empName, date: todayISO, status: "Present" });
-        }
+      const parsed = JSON.parse(todayCheck);
+      if (parsed.checkedIn || parsed.checkInTime || parsed.marked) {
+        basePresent += 1;
       }
-      return list;
-    } catch (e) {
-      return [];
-    }
-  });
+    } catch (e) {}
+  }
 
-  const userRecords = records.filter(
-    (r) => r.employee && r.employee.toLowerCase() === (empName || "").toLowerCase()
-  );
-
-  const presentDays = userRecords.filter((r) => r.status === "Present" || r.status === "P").length;
-  const leaveDays = userRecords.filter((r) => r.status === "On Leave" || r.status === "Leave").length;
-  const wfhDays = userRecords.filter((r) => r.status === "WFH").length;
+  const presentDays = basePresent;
+  const wfhDays = baseWfh;
+  const leaveDays = baseLeave;
   const totalWorkingDays = 25;
-  const attendanceRate = totalWorkingDays > 0 ? Math.round((presentDays / totalWorkingDays) * 100) : 0;
+  const attendanceRate = Math.round((presentDays / totalWorkingDays) * 100);
 
   const daysInMonth = 31;
   const calendarGrid = Array.from({ length: daysInMonth }, (_, i) => {
@@ -374,7 +370,7 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
       )}
 
       {tab === "Attendance" && (
-        <MonthlyAttendanceView empName={profileEmp.name} />
+        <MonthlyAttendanceView empName={profileEmp.name} emp={profileEmp} />
       )}
 
       {tab === "Leave" && (
