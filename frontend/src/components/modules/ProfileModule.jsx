@@ -112,7 +112,6 @@ function MonthlyAttendanceView({ empName }) {
 }
 
 export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
-  const [tab, setTab] = useState("Overview");
   const targetEmp = (currentUser && currentUser.role === "Employee") ? currentUser : (emp || currentUser);
   const [profileEmp, setProfileEmp] = useState(targetEmp);
 
@@ -145,7 +144,12 @@ export function ProfileModule({ emp, back, onUpdateEmp, currentUser }) {
   const [newSkill, setNewSkill] = useState({ name: "", level: 4 });
   const [newDoc, setNewDoc] = useState({ title: "", fileName: "" });
 
-  const tabs = ["Overview", "Attendance", "Leave", "Performance", "Skills", "Documents"];
+  const isTargetManager = profileEmp.role === "Manager" || (currentUser && currentUser.role === "Manager" && (!emp || emp.role === "Manager"));
+  const tabs = isTargetManager
+    ? ["Attendance", "Leave", "Performance", "Skills", "Documents"]
+    : ["Overview", "Attendance", "Leave", "Performance", "Skills", "Documents"];
+
+  const [tab, setTab] = useState(isTargetManager ? "Attendance" : "Overview");
   const color = DEPT_COLORS[profileEmp.department] || "#2F8F82";
 
   const handleSaveProfile = (e) => {

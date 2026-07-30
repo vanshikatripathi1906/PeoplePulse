@@ -143,7 +143,7 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
               <Users size={16} />
             </div>
             <div>
-              <h3 className="nf-h3" style={{ margin: 0 }}>Department Managers (5)</h3>
+              <h3 className="nf-h3" style={{ margin: 0 }}>Department Managers</h3>
               <div style={{ fontSize: 11.5, color: "var(--ink-dim)", marginTop: 2 }}>
                 Heads of Engineering, Product, HR, Finance, and Marketing
               </div>

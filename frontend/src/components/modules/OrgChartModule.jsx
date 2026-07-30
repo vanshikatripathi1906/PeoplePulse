@@ -24,37 +24,32 @@ export function OrgChartModule({ role, employees = [], currentUser }) {
   const dbManagers = validEmployees.filter((e) => e.role === "Manager");
   const managersList = dbManagers.length >= 5 ? dbManagers : defaultManagers;
 
-  // Filter for Manager role to show their own department primary focus
-  const displayManagers = (isManager && currentUser?.department)
-    ? managersList.filter((m) => m.department.toLowerCase() === currentUser.department.toLowerCase() || m.department === "Engineering")
-    : managersList;
+  const displayManagers = managersList;
 
   return (
     <>
       <SectionTitle title="Organizational Hierarchy &amp; Department Structure" />
 
-      {/* ADMIN VIEW: FULL EXECUTIVE HEAD (AMAN VERMA) TOP CARD */}
-      {isAdmin && (
-        <Card style={{ marginBottom: 24, padding: 20, textAlign: "center", background: "var(--surface)" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "var(--ink-dim)", textTransform: "uppercase", marginBottom: 12 }}>
-            Executive Leadership &amp; Administration
+      {/* EXECUTIVE HEAD (AMAN VERMA) TOP CARD FOR ALL ROLES */}
+      <Card style={{ marginBottom: 24, padding: 20, textAlign: "center", background: "var(--surface)" }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", color: "var(--ink-dim)", textTransform: "uppercase", marginBottom: 12 }}>
+          Executive Leadership &amp; Administration
+        </div>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 14, background: "var(--surface-alt)", border: "2px solid #E8A33D", borderRadius: 14, padding: "14px 28px", boxShadow: "0 4px 16px rgba(232, 163, 61, 0.15)" }}>
+          <div className="nf-avatar" style={{ background: "#E8A33D", color: "#000", fontWeight: 800 }}>
+            AV
           </div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 14, background: "var(--surface-alt)", border: "2px solid #E8A33D", borderRadius: 14, padding: "14px 28px", boxShadow: "0 4px 16px rgba(232, 163, 61, 0.15)" }}>
-            <div className="nf-avatar" style={{ background: "#E8A33D", color: "#000", fontWeight: 800 }}>
-              AV
+          <div style={{ textAlign: "left" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span style={{ fontWeight: 800, fontSize: 16 }}>Aman Verma</span>
+              <ShieldCheck size={16} color="#E8A33D" />
             </div>
-            <div style={{ textAlign: "left" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ fontWeight: 800, fontSize: 16 }}>Aman Verma</span>
-                <ShieldCheck size={16} color="#E8A33D" />
-              </div>
-              <div style={{ fontSize: 12, color: "#E8A33D", fontWeight: 700 }}>System Administrator &amp; Head</div>
-              <div style={{ fontSize: 11, color: "var(--ink-dim)", marginTop: 2 }}>adminpeoplepulse@gmail.com</div>
-            </div>
+            <div style={{ fontSize: 12, color: "#E8A33D", fontWeight: 700 }}>System Administrator &amp; Head</div>
+            <div style={{ fontSize: 11, color: "var(--ink-dim)", marginTop: 2 }}>adminpeoplepulse@gmail.com</div>
           </div>
-          <div style={{ width: 2, height: 24, background: "var(--border)", margin: "16px auto 0" }} />
-        </Card>
-      )}
+        </div>
+        <div style={{ width: 2, height: 24, background: "var(--border)", margin: "16px auto 0" }} />
+      </Card>
 
       <Card style={{ padding: 24, overflowX: "auto" }}>
         <div style={{ fontSize: 12, color: "var(--ink-dim)", marginBottom: 20, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>

@@ -199,7 +199,7 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
                       />
                     ))}
                   </div>
-                  {isManager && (
+                  {isManager && emp.role !== "Manager" && (
                     <button className="nf-btn ghost sm" style={{ padding: "3px 8px", fontSize: 11 }} onClick={() => handleOpenEdit(emp)}>
                       <Edit3 size={12} /> Edit Rating
                     </button>

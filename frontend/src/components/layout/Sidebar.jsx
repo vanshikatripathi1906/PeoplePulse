@@ -6,7 +6,7 @@ import {
 
 export const NAV_ITEMS = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["Admin", "Manager", "Employee"] },
-  { key: "directory", label: "Directory", icon: Users, roles: ["Admin", "Manager"] },
+  { key: "directory", label: "Directory", icon: Users, roles: ["Admin"] },
   { key: "profile", label: "My Profile", icon: User, roles: ["Manager", "Employee"] },
   { key: "attendance", label: "Attendance", icon: Clock, roles: ["Manager", "Employee"] },
   { key: "leave", label: "Leave", icon: CalendarDays, roles: ["Admin", "Manager", "Employee"] },
