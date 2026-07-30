@@ -10,13 +10,16 @@ export function PayrollModule({ role, self, employees, currentUser }) {
   const nonAdminEmployees = (employees || []).filter((e) => e.role !== "Admin" && e.name !== "Aman Verma");
 
   let list = nonAdminEmployees;
-  if (role === "Employee") {
-    list = self ? [self] : nonAdminEmployees;
-  } else if (role === "Manager") {
-    const mgrDept = (currentUser?.department || self?.department || "Engineering").toLowerCase();
-    list = nonAdminEmployees.filter(
-      (e) => (e.department || "").toLowerCase() === mgrDept
-    );
+  if (role === "Employee" || role === "Manager") {
+    const target = self || currentUser;
+    if (target) {
+      const match = nonAdminEmployees.filter(
+        (e) => (e.email && target.email && e.email.toLowerCase() === target.email.toLowerCase()) ||
+               (e.name && target.name && e.name.toLowerCase() === target.name.toLowerCase()) ||
+               (e.empId && target.empId && e.empId === target.empId)
+      );
+      list = match.length > 0 ? match : [target];
+    }
   }
 
   const handleDownloadSlip = (emp) => {

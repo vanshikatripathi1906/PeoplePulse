@@ -528,7 +528,7 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
                 </div>
                 <div>
                   <h3 className="nf-h3" style={{ margin: 0 }}>
-                    My Department Team — {currentUser?.department || "Engineering"} ({employees.filter((e) => (e.department || "").toLowerCase() === (currentUser?.department || "Engineering").toLowerCase() && e.role === "Employee").length || 10} Employees)
+                    My Department Team — {currentUser?.department || "Engineering"}
                   </h3>
                   <div style={{ fontSize: 11.5, color: "var(--ink-dim)", marginTop: 2 }}>
                     Employees working in your department and assigned directly to you
