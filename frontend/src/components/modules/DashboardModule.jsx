@@ -495,10 +495,63 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
 
       {/* ROLE SPECIFIC DASHBOARD VIEWS */}
 
-      {/* 1. MANAGER DASHBOARD: SHOWS UPCOMING EVENTS ONLY */}
+      {/* 1. MANAGER DASHBOARD: SHOWS MY DEPARTMENT TEAM & UPCOMING EVENTS */}
       {isManager && (
-        <div style={{ maxWidth: 700 }}>
-          <UpcomingEventsCard />
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          {/* MY DEPARTMENT TEAM CARD FOR LOGGED-IN MANAGER */}
+          <Card>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div className="nf-avatar sm" style={{ background: "#2F8F8226", color: "#2F8F82" }}>
+                  <Users size={16} />
+                </div>
+                <div>
+                  <h3 className="nf-h3" style={{ margin: 0 }}>
+                    My Department Team — {currentUser?.department || "Engineering"} ({employees.filter((e) => (e.department || "").toLowerCase() === (currentUser?.department || "Engineering").toLowerCase() && e.role === "Employee").length || 10} Employees)
+                  </h3>
+                  <div style={{ fontSize: 11.5, color: "var(--ink-dim)", marginTop: 2 }}>
+                    Employees working in your department and assigned directly to you
+                  </div>
+                </div>
+              </div>
+              <Pill tone="good">Managed by {currentUser?.name || "Manager"}</Pill>
+            </div>
+
+            <div style={{ overflowX: "auto" }}>
+              <table className="nf-table" style={{ width: "100%", textAlign: "left", fontSize: 13 }}>
+                <thead>
+                  <tr style={{ background: "var(--surface-alt)", borderBottom: "1px solid var(--border)" }}>
+                    <th style={{ padding: "10px 12px" }}>Employee Name</th>
+                    <th style={{ padding: "10px 12px" }}>Designation</th>
+                    <th style={{ padding: "10px 12px" }}>Email Address</th>
+                    <th style={{ padding: "10px 12px" }}>Experience</th>
+                    <th style={{ padding: "10px 12px" }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {employees
+                    .filter((e) => (e.department || "").toLowerCase() === (currentUser?.department || "Engineering").toLowerCase() && e.role === "Employee")
+                    .map((emp, idx) => (
+                      <tr key={emp.empId || idx} style={{ borderBottom: "1px solid var(--border)" }}>
+                        <td style={{ padding: "10px 12px", fontWeight: 600 }}>{emp.name}</td>
+                        <td style={{ padding: "10px 12px", color: "var(--ink-dim)" }}>{emp.designation}</td>
+                        <td style={{ padding: "10px 12px", color: "#2F8F82" }}>{emp.email}</td>
+                        <td style={{ padding: "10px 12px", color: "var(--ink-dim)" }}>{emp.experience || "3 Years"}</td>
+                        <td style={{ padding: "10px 12px" }}>
+                          <span style={{ fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 6, background: "#2F8F8222", color: "#2F8F82" }}>
+                            Active
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          <div style={{ maxWidth: 700 }}>
+            <UpcomingEventsCard />
+          </div>
         </div>
       )}
 
