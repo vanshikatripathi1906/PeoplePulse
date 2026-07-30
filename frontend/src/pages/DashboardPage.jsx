@@ -86,11 +86,11 @@ INITIAL_EMPLOYEES_DATA.forEach((employee, index) => {
 });
 
 const DEPARTMENTS_DATA = [
-  { name: "Engineering", head: "Rahul Sharma", count: 11, avgExp: "4.5 Years", projects: 18 },
-  { name: "Product", head: "Priya Nair", count: 11, avgExp: "4.2 Years", projects: 12 },
-  { name: "HR", head: "Sneha Gupta", count: 11, avgExp: "4.8 Years", projects: 6 },
-  { name: "Finance", head: "Rohan Kapoor", count: 11, avgExp: "5.5 Years", projects: 8 },
-  { name: "Marketing", head: "Ananya Sen", count: 11, avgExp: "4.0 Years", projects: 10 },
+  { name: "Engineering", head: "Rahul Sharma", count: 10, avgExp: "4.5 Years", projects: 18 },
+  { name: "Product", head: "Priya Nair", count: 10, avgExp: "4.2 Years", projects: 12 },
+  { name: "HR", head: "Sneha Gupta", count: 10, avgExp: "4.8 Years", projects: 6 },
+  { name: "Finance", head: "Rohan Kapoor", count: 10, avgExp: "5.5 Years", projects: 8 },
+  { name: "Marketing", head: "Ananya Sen", count: 10, avgExp: "4.0 Years", projects: 10 },
 ];
 
 export function DashboardPage({ role, onLogout }) {

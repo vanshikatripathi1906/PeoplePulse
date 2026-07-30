@@ -39,7 +39,7 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
   const getDeptEmployeeCount = (deptName) => {
     if (!employees || employees.length === 0) return null;
     const matchCount = employees.filter(
-      (e) => (e.department || "").toLowerCase().trim() === deptName.toLowerCase().trim()
+      (e) => (e.department || "").toLowerCase().trim() === deptName.toLowerCase().trim() && e.role !== "Manager" && e.role !== "Admin"
     ).length;
     return matchCount;
   };
