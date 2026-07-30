@@ -39,9 +39,15 @@ export function NotificationsModule({ role, currentUser, onApprovePending, onRej
     localStorage.setItem("peoplepulse_notifications", JSON.stringify(rawNotifs));
   }, [rawNotifs]);
 
-  // Filter notifications strictly by recipient for ALL users
+  // Filter notifications strictly by recipient & department for ALL users
   const notifications = rawNotifs.filter((n) => {
-    if (!n.recipient) return role === "Admin"; // Admin also sees general announcements
+    if (n.department) {
+      if (n.department === "All Departments" || n.department === "All") return true;
+      if (currentUser?.department && currentUser.department.toLowerCase() === n.department.toLowerCase()) return true;
+      if (role === "Admin") return true;
+      return false;
+    }
+    if (!n.recipient) return true;
     const recipientLower = (n.recipient || "").toLowerCase();
     const currentNameLower = (currentUser?.name || "").toLowerCase();
     const currentEmailLower = (currentUser?.email || "").toLowerCase();

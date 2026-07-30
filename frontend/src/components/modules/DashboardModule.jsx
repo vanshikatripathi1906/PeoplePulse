@@ -242,21 +242,24 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
     setShowEventModal(false);
     setEventForm({ title: "", date: "2026-07-30", time: "03:00 PM", tag: "General" });
 
-    // Send Notification
+    // Send Notification to department workforce
     try {
       const savedNotifs = localStorage.getItem("peoplepulse_notifications");
       const currentNotifs = savedNotifs ? JSON.parse(savedNotifs) : [];
+      const targetDept = eventForm.tag || "Engineering";
       const newNotif = {
         id: Date.now(),
-        title: "New Event Scheduled",
-        message: `${newEv.title} has been scheduled for ${newEv.day} (${newEv.time}).`,
+        title: `📅 New Meeting Scheduled — ${eventForm.title}`,
+        message: `Meeting "${eventForm.title}" is scheduled for ${newEv.day} (${newEv.time}). All team members in ${targetDept} are notified to attend.`,
+        department: targetDept,
         createdAt: Date.now(),
         unread: true,
+        type: "info",
       };
       localStorage.setItem("peoplepulse_notifications", JSON.stringify([newNotif, ...currentNotifs]));
     } catch (e) {}
 
-    setNotification(`Event "${eventForm.title}" scheduled successfully for ${formattedLabel}!`);
+    setNotification(`Meeting "${eventForm.title}" scheduled for ${targetDept} on ${formattedLabel}!`);
     setTimeout(() => setNotification(null), 3500);
   };
 
@@ -487,8 +490,20 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
                   <input type="text" className="nf-select" placeholder="e.g. 3:00 PM" value={eventForm.time} onChange={(e) => setEventForm({ ...eventForm, time: e.target.value })} required />
                 </label>
               </div>
-              <label>Event Tag / Department
-                <input className="nf-select" placeholder="e.g. All Hands Meeting" value={eventForm.tag} onChange={(e) => setEventForm({ ...eventForm, tag: e.target.value })} required />
+              <label>Target Department / Audience
+                <select
+                  className="nf-select"
+                  value={eventForm.tag}
+                  onChange={(e) => setEventForm({ ...eventForm, tag: e.target.value })}
+                  required
+                >
+                  <option value="Engineering">Engineering</option>
+                  <option value="Product">Product</option>
+                  <option value="HR">HR</option>
+                  <option value="Finance">Finance</option>
+                  <option value="Marketing">Marketing</option>
+                  <option value="All Departments">All Departments (Company-wide)</option>
+                </select>
               </label>
               <div style={{ display: "flex", gap: 10, marginTop: 10, justifyContent: "flex-end" }}>
                 <button type="button" className="nf-btn ghost" onClick={() => setShowEventModal(false)}>Cancel</button>
