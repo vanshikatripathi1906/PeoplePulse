@@ -6,6 +6,7 @@ import { Card } from "../common/Card";
 import { StatCard } from "../common/StatCard";
 import { SectionTitle } from "../common/SectionTitle";
 import { DEPT_COLORS } from "../common/EmployeeBadge";
+import { Pill } from "../common/Pill";
 
 export function formatRelativeTime(timestamp) {
   if (!timestamp) return "Just now";
@@ -173,9 +174,12 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
   const userDeptRank = userIndexInDept !== -1 ? userIndexInDept + 1 : 1;
   const userDeptScore = userIndexInDept !== -1 ? deptRankedList[userIndexInDept]?.score : 91;
 
-  const totalManagers = employees.filter((e) => e.role === "Manager").length || 5;
-  const totalEmployeesOnly = employees.filter((e) => e.role === "Employee").length || 45;
-  const totalWorkforce = 50;
+  const nonAdminEmployees = (employees || []).filter(
+    (e) => e.role !== "Admin" && e.name !== "Aman Verma"
+  );
+  const totalManagers = nonAdminEmployees.filter((e) => e.role === "Manager").length || 5;
+  const totalEmployeesOnly = nonAdminEmployees.filter((e) => e.role === "Employee").length;
+  const totalWorkforce = nonAdminEmployees.length || (totalManagers + totalEmployeesOnly);
 
   const stats = [
     {
