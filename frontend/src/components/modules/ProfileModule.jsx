@@ -34,17 +34,6 @@ function MonthlyAttendanceView({ empName, emp }) {
   const totalWorkingDays = 25;
   const attendanceRate = Math.round((presentDays / totalWorkingDays) * 100);
 
-  const daysInMonth = 31;
-  const calendarGrid = Array.from({ length: daysInMonth }, (_, i) => {
-    const dayNum = i + 1;
-    const dateStr = `2026-07-${String(dayNum).padStart(2, "0")}`;
-    const rec = userRecords.find((r) => r.date === dateStr);
-    let status = rec ? rec.status : (dayNum % 7 === 0 || dayNum % 7 === 6) ? "Weekend" : "Present";
-    if (dayNum === 14) status = "On Leave";
-    if (dayNum === 20 || dayNum === 27) status = "WFH";
-    return { dayNum, status };
-  });
-
   return (
     <Card>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
