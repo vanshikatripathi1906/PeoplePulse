@@ -31,17 +31,19 @@ export function PerformanceModule({ role, employees = [], onUpdateEmp, currentUs
   const isManager = role === "Manager";
   const isEmployee = role === "Employee";
 
-  // Filter performance list strictly by current logged-in user for Employee role
-  let displayEmployees = employees;
+  // Filter performance list strictly by excluding Admin (Aman Verma)
+  let displayEmployees = (employees || []).filter(
+    (e) => e.role !== "Admin" && e.name !== "Aman Verma"
+  );
   if (isEmployee && currentUser) {
-    displayEmployees = employees.filter(
+    displayEmployees = displayEmployees.filter(
       (e) =>
         (e.email && currentUser.email && e.email.toLowerCase() === currentUser.email.toLowerCase()) ||
         (e.name && currentUser.name && e.name.toLowerCase() === currentUser.name.toLowerCase()) ||
         (e.empId && currentUser.empId && e.empId === currentUser.empId)
     );
   } else if (role === "Manager" && currentUser?.department) {
-    displayEmployees = employees.filter(
+    displayEmployees = displayEmployees.filter(
       (e) => e.department?.toLowerCase() === currentUser.department?.toLowerCase()
     );
   }

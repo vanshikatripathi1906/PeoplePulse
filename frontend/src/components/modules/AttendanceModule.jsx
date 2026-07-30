@@ -318,9 +318,11 @@ export function AttendanceModule({ role, employees }) {
                 </tr>
               </thead>
               <tbody>
-                {employees.map((emp, idx) => {
-                  const isMgr = emp.role === "Manager" || emp.role === "Admin";
-                  const statusLabel = idx % 9 === 0 ? "Work From Home" : idx % 11 === 0 ? "On Leave" : "Present";
+                {employees
+                  .filter((emp) => emp.role !== "Admin" && emp.name !== "Aman Verma")
+                  .map((emp, idx) => {
+                    const isMgr = emp.role === "Manager";
+                    const statusLabel = idx % 9 === 0 ? "Work From Home" : idx % 11 === 0 ? "On Leave" : "Present";
                   const statusColor = statusLabel === "Present" ? "#2F8F82" : statusLabel === "Work From Home" ? "#38BDF8" : "#E8A33D";
                   const timeStr = statusLabel === "On Leave" ? "—" : idx % 2 === 0 ? "09:02 AM" : "09:15 AM";
 

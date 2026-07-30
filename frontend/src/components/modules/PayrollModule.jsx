@@ -6,7 +6,7 @@ import { DEPT_COLORS } from "../common/EmployeeBadge";
 
 export function PayrollModule({ role, self, employees }) {
   const [notification, setNotification] = useState(null);
-  const list = role === "Employee" ? [self] : employees;
+  const list = role === "Employee" ? [self] : (employees || []).filter((e) => e.role !== "Admin" && e.name !== "Aman Verma");
 
   const handleDownloadSlip = (emp) => {
     const slipContent = `===================================================================

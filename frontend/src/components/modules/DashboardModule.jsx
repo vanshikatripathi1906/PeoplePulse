@@ -134,24 +134,26 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
 
   // DYNAMIC DEPARTMENT-WISE TOP PERFORMERS & RANKINGS FROM MONGODB ATLAS
   const allScoredEmployees = (employees && employees.length > 0)
-    ? employees.map((emp) => {
-        const t = Number(emp.perf?.Technical) || 8;
-        const c = Number(emp.perf?.Communication) || 8;
-        const l = Number(emp.perf?.Leadership) || 7;
-        const stars = Number(emp.perf?.stars) || Math.min(5, Math.max(1, Math.round((t + c + l) / 6)));
-        const score = Math.min(99, Math.round(((t + c + l) / 30) * 80 + stars * 4));
-        const avatar = emp.initials || (emp.name ? emp.name.split(" ").map((w) => w[0]).slice(0, 2).join("") : "EM");
-        return {
-          name: emp.name,
-          email: emp.email,
-          empId: emp.empId,
-          department: emp.department || "Engineering",
-          role: emp.designation || emp.role || "Team Member",
-          score: score,
-          avatar: avatar,
-          color: DEPT_COLORS[emp.department] || "#38BDF8",
-        };
-      })
+    ? employees
+        .filter((emp) => emp.role !== "Admin" && emp.name !== "Aman Verma")
+        .map((emp) => {
+          const t = Number(emp.perf?.Technical) || 8;
+          const c = Number(emp.perf?.Communication) || 8;
+          const l = Number(emp.perf?.Leadership) || 7;
+          const stars = Number(emp.perf?.stars) || Math.min(5, Math.max(1, Math.round((t + c + l) / 6)));
+          const score = Math.min(99, Math.round(((t + c + l) / 30) * 80 + stars * 4));
+          const avatar = emp.initials || (emp.name ? emp.name.split(" ").map((w) => w[0]).slice(0, 2).join("") : "EM");
+          return {
+            name: emp.name,
+            email: emp.email,
+            empId: emp.empId,
+            department: emp.department || "Engineering",
+            role: emp.designation || emp.role || "Team Member",
+            score: score,
+            avatar: avatar,
+            color: DEPT_COLORS[emp.department] || "#38BDF8",
+          };
+        })
     : DEFAULT_TOP_PERFORMERS;
 
   // Filter department top performers for Employee & Manager view
