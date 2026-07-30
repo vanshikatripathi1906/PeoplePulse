@@ -171,11 +171,43 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
   const userDeptRank = userIndexInDept !== -1 ? userIndexInDept + 1 : 1;
   const userDeptScore = userIndexInDept !== -1 ? deptRankedList[userIndexInDept]?.score : 91;
 
+  const totalManagers = employees.filter((e) => e.role === "Manager").length || 5;
+  const totalEmployeesOnly = employees.filter((e) => e.role === "Employee").length || 45;
+  const totalWorkforce = safeTotal;
+
   const stats = [
-    { label: "TOTAL EMPLOYEES", value: safeTotal.toString(), sub: "active workforce", icon: Users, accent: "#E8A33D", clickType: "total" },
-    { label: "EMPLOYEES PRESENT", value: Math.max(1, safeTotal - safeApprovedLeave).toString(), sub: "checked in today", icon: CheckCircle2, accent: "#2F8F82", clickType: "present" },
-    { label: "ON LEAVE", value: safeApprovedLeave.toString(), sub: "approved leave", icon: AlertCircle, accent: "#E2604F", clickType: "leave" },
-    { label: "REMOTE / WFH", value: (metrics.wfh || 4).toString(), sub: "working remotely", icon: Clock, accent: "#38BDF8", clickType: "wfh" },
+    {
+      label: "TOTAL WORKFORCE",
+      value: totalWorkforce.toString(),
+      sub: `${totalManagers} Managers · ${totalEmployeesOnly} Employees`,
+      icon: Users,
+      accent: "#E8A33D",
+      clickType: "total",
+    },
+    {
+      label: "WORKFORCE PRESENT",
+      value: Math.max(1, totalWorkforce - safeApprovedLeave).toString(),
+      sub: "checked in today (Managers & Employees)",
+      icon: CheckCircle2,
+      accent: "#2F8F82",
+      clickType: "present",
+    },
+    {
+      label: "ON LEAVE",
+      value: safeApprovedLeave.toString(),
+      sub: "approved leave",
+      icon: AlertCircle,
+      accent: "#E2604F",
+      clickType: "leave",
+    },
+    {
+      label: "REMOTE / WFH",
+      value: (metrics.wfh || 4).toString(),
+      sub: "working remotely",
+      icon: Clock,
+      accent: "#38BDF8",
+      clickType: "wfh",
+    },
   ];
 
   const handleCreateEvent = (e) => {
@@ -488,6 +520,42 @@ export function DashboardModule({ role, employees = [], leaveRequests = [], goPr
               </div>
             ))}
           </div>
+
+          {/* DEDICATED DEPARTMENT MANAGERS CARD FOR ADMIN */}
+          <Card style={{ marginBottom: 28 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div className="nf-avatar sm" style={{ background: "#E8A33D26", color: "#E8A33D" }}>
+                  <Users size={16} />
+                </div>
+                <div>
+                  <h3 className="nf-h3" style={{ margin: 0 }}>Department Managers (5)</h3>
+                  <div style={{ fontSize: 11.5, color: "var(--ink-dim)", marginTop: 2 }}>
+                    Heads of Engineering, Product, HR, Finance, and Marketing
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12 }}>
+              {employees.filter((e) => e.role === "Manager" || (e.designation && e.designation.includes("Manager"))).map((m) => (
+                <div
+                  key={m.empId || m.name}
+                  style={{
+                    background: "var(--surface-alt)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 10,
+                    padding: "12px 14px",
+                  }}
+                >
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#E8A33D", textTransform: "uppercase" }}>{m.department}</div>
+                  <div style={{ fontWeight: 700, fontSize: 13.5, marginTop: 4 }}>{m.name}</div>
+                  <div style={{ fontSize: 11, color: "var(--ink-dim)", marginTop: 2 }}>{m.designation || "Manager"}</div>
+                  <div style={{ fontSize: 11, color: "#2F8F82", marginTop: 6, fontWeight: 600 }}>{m.email}</div>
+                </div>
+              ))}
+            </div>
+          </Card>
 
           <div style={{ marginBottom: 28, maxWidth: 800 }}>
             <UpcomingEventsCard />
