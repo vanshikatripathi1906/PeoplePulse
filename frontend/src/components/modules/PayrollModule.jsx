@@ -4,9 +4,20 @@ import { Card } from "../common/Card";
 import { SectionTitle } from "../common/SectionTitle";
 import { DEPT_COLORS } from "../common/EmployeeBadge";
 
-export function PayrollModule({ role, self, employees }) {
+export function PayrollModule({ role, self, employees, currentUser }) {
   const [notification, setNotification] = useState(null);
-  const list = role === "Employee" ? [self] : (employees || []).filter((e) => e.role !== "Admin" && e.name !== "Aman Verma");
+  
+  const nonAdminEmployees = (employees || []).filter((e) => e.role !== "Admin" && e.name !== "Aman Verma");
+
+  let list = nonAdminEmployees;
+  if (role === "Employee") {
+    list = self ? [self] : nonAdminEmployees;
+  } else if (role === "Manager") {
+    const mgrDept = (currentUser?.department || self?.department || "Engineering").toLowerCase();
+    list = nonAdminEmployees.filter(
+      (e) => (e.department || "").toLowerCase() === mgrDept
+    );
+  }
 
   const handleDownloadSlip = (emp) => {
     const slipContent = `===================================================================

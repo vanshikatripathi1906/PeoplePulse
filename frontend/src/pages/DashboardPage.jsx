@@ -441,7 +441,7 @@ export function DashboardPage({ role, onLogout }) {
   } else if (currentPage === "orgchart") {
     pageContent = <OrgChartModule role={role} employees={employeesList} currentUser={loggedInUser} />;
   } else if (currentPage === "payroll") {
-    pageContent = <PayrollModule role={role} self={loggedInUser} employees={employeesList} />;
+    pageContent = <PayrollModule role={role} self={loggedInUser} employees={employeesList} currentUser={loggedInUser} />;
   } else if (currentPage === "analytics") {
     pageContent = <AnalyticsModule employees={employeesList} />;
   } else if (currentPage === "notifications") {
