@@ -1,35 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { Plus, Building2, ChevronDown, CheckCircle2, Edit3, Trash2 } from "lucide-react";
+import { Plus, Building2, CheckCircle2, Edit3, Trash2 } from "lucide-react";
 import { Card } from "../common/Card";
 import { SectionTitle } from "../common/SectionTitle";
 
-const EXTRA_DEPARTMENTS = [
-  { name: "Product & Design", head: "Kavya Menon", count: 28, avgExp: "4.5 Years", projects: 7 },
-  { name: "Legal & Compliance", head: "Rohan Kapoor", count: 18, avgExp: "6.0 Years", projects: 3 },
-  { name: "IT Infrastructure", head: "Siddharth Jain", count: 24, avgExp: "5.1 Years", projects: 5 },
-];
-
 export function DepartmentsModule({ role, departments, employees = [], currentUser }) {
   const [deptList, setDeptList] = useState(() => {
-    const saved = localStorage.getItem("peoplepulse_departments");
-    return saved ? JSON.parse(saved) : departments;
+    try {
+      const saved = localStorage.getItem("peoplepulse_departments");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Keep only active departments with head assigned
+          return parsed;
+        }
+      }
+    } catch (e) {}
+    return departments;
   });
 
   useEffect(() => {
     localStorage.setItem("peoplepulse_departments", JSON.stringify(deptList));
   }, [deptList]);
 
-  const [hasLoadedMore, setHasLoadedMore] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingDept, setEditingDept] = useState(null);
   const [notification, setNotification] = useState(null);
 
   const isManagerOrAdmin = role === "Admin" || role === "Manager";
-
-  // Filter department cards for Manager role: show only Manager's concerned department
-  const displayDepartments = role === "Manager" && currentUser?.department
-    ? deptList.filter((d) => d.name.toLowerCase() === currentUser.department.toLowerCase() || d.name === "Engineering")
-    : deptList;
 
   const [deptForm, setDeptForm] = useState({
     name: "",
@@ -47,10 +44,16 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
     return matchCount;
   };
 
-  const handleLoadMore = () => {
-    setDeptList([...deptList, ...EXTRA_DEPARTMENTS]);
-    setHasLoadedMore(true);
-  };
+  // Filter department cards: show ONLY active departments where employees are actually working (count > 0)
+  const activeWorkingDepartments = (
+    role === "Manager" && currentUser?.department
+      ? deptList.filter((d) => d.name.toLowerCase() === currentUser.department.toLowerCase() || d.name === "Engineering")
+      : deptList
+  ).filter((d) => {
+    const liveCount = getDeptEmployeeCount(d.name);
+    const countToUse = liveCount !== null ? liveCount : d.count;
+    return countToUse > 0;
+  });
 
   const handleCreateDept = (e) => {
     e.preventDefault();
@@ -143,8 +146,8 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
               <label>Department Name
                 <input className="nf-select" placeholder="e.g. AI Research" value={deptForm.name} onChange={(e) => setDeptForm({ ...deptForm, name: e.target.value })} required />
               </label>
-              <label>Department Head
-                <input className="nf-select" placeholder="e.g. Aman Verma" value={deptForm.head} onChange={(e) => setDeptForm({ ...deptForm, head: e.target.value })} required />
+              <label>Department Head / Manager
+                <input className="nf-select" placeholder="e.g. Rahul Sharma" value={deptForm.head} onChange={(e) => setDeptForm({ ...deptForm, head: e.target.value })} required />
               </label>
               <div style={{ display: "flex", gap: 10 }}>
                 <label style={{ flex: 1 }}>Member Count
@@ -171,7 +174,7 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
               <label>Department Name
                 <input className="nf-select" value={deptForm.name} onChange={(e) => setDeptForm({ ...deptForm, name: e.target.value })} required />
               </label>
-              <label>Department Head
+              <label>Department Head / Manager
                 <input className="nf-select" value={deptForm.head} onChange={(e) => setDeptForm({ ...deptForm, head: e.target.value })} required />
               </label>
               <div style={{ display: "flex", gap: 10 }}>
@@ -192,7 +195,7 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
       )}
 
       <div className="nf-grid-3">
-        {displayDepartments.map((d) => {
+        {activeWorkingDepartments.map((d) => {
           const liveCount = getDeptEmployeeCount(d.name);
           const displayCount = liveCount !== null ? liveCount : d.count;
 
@@ -240,11 +243,9 @@ export function DepartmentsModule({ role, departments, employees = [], currentUs
         })}
       </div>
 
-      {role === "Admin" && !hasLoadedMore && (
-        <div style={{ textAlign: "center", marginTop: 24 }}>
-          <button className="nf-btn ghost" onClick={handleLoadMore}>
-            <ChevronDown size={14} /> Load 3 more departments
-          </button>
+      {activeWorkingDepartments.length === 0 && (
+        <div className="nf-empty" style={{ padding: 30 }}>
+          No active departments with working employees found.
         </div>
       )}
     </>
