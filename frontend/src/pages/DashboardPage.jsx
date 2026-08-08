@@ -139,10 +139,12 @@ export function DashboardPage({ role, onLogout }) {
   }, []);
 
   const handleApprovePendingUser = async (user) => {
-    const targetId = user._id || user.id;
-    try {
-      await approveUserAPI(targetId);
-    } catch (e) {}
+    const targetId = user?._id || user?.id || user?.email;
+    if (targetId && targetId !== "undefined") {
+      try {
+        await approveUserAPI(targetId);
+      } catch (e) {}
+    }
 
     const newEmp = {
       id: user._id || Date.now(),
@@ -158,7 +160,7 @@ export function DashboardPage({ role, onLogout }) {
       type: "Full-time",
       status: "Active",
       joined: "Jul 2026",
-      initials: user.name.split(" ").map((w) => w[0]).slice(0, 2).join(""),
+      initials: user.name ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("") : "U",
       attendance: Array(28).fill("P"),
       skills: [{ name: "React", level: 3 }, { name: "Communication", level: 4 }],
       documents: ["Resume", "Offer Letter"],
@@ -168,7 +170,7 @@ export function DashboardPage({ role, onLogout }) {
 
     const updatedList = [newEmp, ...employeesList];
     setEmployeesList(updatedList);
-    setPendingUsers(pendingUsers.filter((p) => (p._id || p.id) !== targetId));
+    setPendingUsers(pendingUsers.filter((p) => (p._id || p.id || p.email) !== targetId));
 
     try {
       const savedMetrics = localStorage.getItem("peoplepulse_dashboard_metrics");
@@ -193,11 +195,14 @@ export function DashboardPage({ role, onLogout }) {
     } catch (e) {}
   };
 
-  const handleRejectPendingUser = async (userId) => {
-    try {
-      await rejectUserAPI(userId);
-    } catch (e) {}
-    setPendingUsers(pendingUsers.filter((p) => (p._id || p.id) !== userId));
+  const handleRejectPendingUser = async (target) => {
+    const targetId = typeof target === "object" ? (target?._id || target?.id || target?.email) : target;
+    if (targetId && targetId !== "undefined") {
+      try {
+        await rejectUserAPI(targetId);
+      } catch (e) {}
+    }
+    setPendingUsers(pendingUsers.filter((p) => (p._id || p.id || p.email) !== targetId));
   };
 
   const [selectedEmployee, setSelectedEmployee] = useState(() => (employeesList && employeesList.length > 0 ? employeesList[1] || employeesList[0] : INITIAL_EMPLOYEES_DATA[0]));

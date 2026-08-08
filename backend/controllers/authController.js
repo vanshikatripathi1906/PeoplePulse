@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 const User = require("../models/User");
 
 const generateToken = (id) => {
@@ -113,9 +114,20 @@ const getPendingUsers = async (req, res) => {
 
 const approveUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const target = req.params.id;
+    if (!target || target === "undefined") {
+      return res.status(400).json({ message: "Invalid approval ID or email." });
+    }
+
+    let user;
+    if (mongoose.Types.ObjectId.isValid(target)) {
+      user = await User.findById(target);
+    } else {
+      user = await User.findOne({ email: new RegExp(`^${target.trim()}$`, "i") });
+    }
+
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found in system." });
     }
 
     user.status = "Active";
@@ -135,9 +147,20 @@ const approveUser = async (req, res) => {
 
 const rejectUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const target = req.params.id;
+    if (!target || target === "undefined") {
+      return res.status(400).json({ message: "Invalid rejection ID or email." });
+    }
+
+    let user;
+    if (mongoose.Types.ObjectId.isValid(target)) {
+      user = await User.findById(target);
+    } else {
+      user = await User.findOne({ email: new RegExp(`^${target.trim()}$`, "i") });
+    }
+
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found in system." });
     }
 
     user.status = "Rejected";
