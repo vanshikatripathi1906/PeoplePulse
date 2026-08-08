@@ -1,69 +1,65 @@
-# 💼 PeoplePulse — Modern MERN HR & Workforce Management System
+# PeoplePulse — HR & Workforce Management System
 
-![PeoplePulse](https://img.shields.io/badge/Status-Live%20Production-2F8F82?style=for-the-badge)
-![MERN Stack](https://img.shields.io/badge/Stack-MongoDB%20%7C%20Express%20%7C%20React%20%7C%20Node.js-38BDF8?style=for-the-badge)
+Live Demo: [https://people-pulse-pi.vercel.app](https://people-pulse-pi.vercel.app)  
+Backend API: [https://peoplepulse-3q72.onrender.com](https://peoplepulse-3q72.onrender.com)
 
-> A modern, full-stack Human Resource Management System (HRMS) built with React 18, Node.js, Express, and MongoDB Atlas. Features dynamic Role-Based Access Control (RBAC), workforce attendance tracking, departmental org charts, performance evaluations, and automated meeting notification dispatching.
-
----
-
-## 🌐 Live Production Links
-
-* 🚀 **Live Web Application (Frontend)**: **[https://people-pulse-pi.vercel.app](https://people-pulse-pi.vercel.app)**
-* ⚙️ **REST API Server (Backend)**: **[https://peoplepulse-3q72.onrender.com](https://peoplepulse-3q72.onrender.com)**
-* 📁 **GitHub Repository**: **[https://github.com/vanshikatripathi1906/PeoplePulse](https://github.com/vanshikatripathi1906/PeoplePulse)**
+PeoplePulse is a full-stack HR management web app built using the MERN stack. It helps manage workforce directory, employee attendance, department team structures, performance evaluations, and salary slips with role-based access for Admin, Managers, and Employees.
 
 ---
 
-## 🔐 Demo Credentials for Login
+## Live Demo Login Credentials
 
-| Role | Email | Password | Access Scope |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `adminpeoplepulse@gmail.com` | `admin123` | Full System Control, Directory, Workforce Logs |
-| **Manager (Engineering)** | `managerpeoplepulse@gmail.com` | `manager123` | Departmental Team, Performance Rating, Events |
-| **Employee** | `vanshikapeoplepulse@gmail.com` | `employee123` | Personal Profile, Daily Check-In, Salary Slips |
+Try logging in with any of these accounts:
 
----
-
-## ✨ Key Features & Highlights
-
-- **🛡️ Dynamic Role-Based Access Control (RBAC)**: Custom UI and data scoping for Admin, Manager, and Employee accounts.
-- **📁 Employee Directory & Hierarchy**: Real-time workforce management synced directly with MongoDB Atlas cloud database.
-- **⏱️ Attendance & Daily Punching**: Dynamic check-in/check-out system with automatic compliance rate calculations.
-- **📊 Performance Evaluation Matrix**: Interactive technical, communication, and leadership ratings with top performer rankings.
-- **💰 Scoped Payroll Management**: Downloadable salary slip text downloads with custom gross/net breakdown.
-- **📅 Departmental Event Scheduling**: Meeting scheduler with automatic real-time notification dispatch to target departments.
-- **🌳 Unified Organizational Chart**: Clean 3-tier hierarchy visualization across Executive Head, Department Managers, and Employees.
+- **Admin Account**: `adminpeoplepulse@gmail.com` / `admin123`
+- **Manager Account**: `managerpeoplepulse@gmail.com` / `manager123`
+- **Employee Account**: `vanshikapeoplepulse@gmail.com` / `employee123`
 
 ---
 
-## 🛠️ Technology Stack
+## Features
 
-* **Frontend**: React 18, Vite, Lucide Icons, Recharts, Axios, Vanilla CSS Tokens
-* **Backend**: Node.js, Express.js, Cors, Dotenv, JWT Authentication
-* **Database**: MongoDB Atlas Cloud, Mongoose ODM
-* **Deployment**: Vercel (Frontend SPA) + Render (Backend API Service)
-
----
-
-## 💻 Local Development Setup
-
-```bash
-# 1. Clone Repository
-git clone https://github.com/vanshikatripathi1906/PeoplePulse.git
-cd PeoplePulse
-
-# 2. Setup & Run Backend
-cd backend
-npm install
-npm run dev
-
-# 3. Setup & Run Frontend (In a new terminal)
-cd frontend
-npm install
-npm run dev
-```
+- **Role-Based Access (Admin / Manager / Employee)**: Different dashboard views and permissions for each role.
+- **Employee Directory**: Manage employee profiles, departments, and designations.
+- **Attendance Tracking**: Punch in/out daily check-ins with attendance percentage calculations.
+- **Performance Evaluation**: Rating matrix and department rank tracking.
+- **Payroll**: View monthly salary breakdown and download salary slips.
+- **Events & Notifications**: Schedule meetings and send real-time alerts to target departments.
+- **Organization Chart**: Clean hierarchy showing Admin, Department Managers, and Employees.
 
 ---
 
-*Developed with ❤️ by Vanshika Tripathi*
+## Tech Stack
+
+- **Frontend**: React.js, Vite, Lucide Icons, Vanilla CSS
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB Atlas (Mongoose)
+- **Deployment**: Vercel (Frontend) & Render (Backend)
+
+---
+
+## Running Locally
+
+1. **Clone the repo**
+   ```bash
+   git clone https://github.com/vanshikatripathi1906/PeoplePulse.git
+   cd PeoplePulse
+   ```
+
+2. **Start Backend**
+   ```bash
+   cd backend
+   npm install
+   npm start
+   ```
+
+3. **Start Frontend**
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+---
+
+*Created by Vanshika Tripathi*
