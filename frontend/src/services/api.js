@@ -96,4 +96,9 @@ export const updateTaskStatusAPI = async (id, status) => {
   return response.data;
 };
 
+export const fetchNetworkHierarchyAPI = async () => {
+  const response = await API.get("/network/hierarchy");
+  return response.data;
+};
+
 export default API;

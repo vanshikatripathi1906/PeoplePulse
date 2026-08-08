@@ -1,12 +1,23 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "../common/Card";
 import { SectionTitle } from "../common/SectionTitle";
 import { DEPT_COLORS } from "../common/EmployeeBadge";
-import { ShieldCheck, Users } from "lucide-react";
+import { ShieldCheck, Users, Network } from "lucide-react";
+import { fetchNetworkHierarchyAPI } from "../../services/api";
 
 export function OrgChartModule({ role, employees = [], currentUser }) {
   const isAdmin = role === "Admin";
-  const isManager = role === "Manager";
+  const [networkData, setNetworkData] = useState(null);
+
+  useEffect(() => {
+    fetchNetworkHierarchyAPI()
+      .then((data) => {
+        if (data && data.success) {
+          setNetworkData(data);
+        }
+      })
+      .catch((err) => console.log("Network API fallback to prop employees"));
+  }, []);
 
   const validEmployees = (employees && employees.length > 0)
     ? employees.filter((e) => e.name !== "Aman Verma" || isAdmin)

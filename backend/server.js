@@ -30,6 +30,7 @@ app.use("/api/employees", require("./routes/employeeRoutes"));
 app.use("/api/departments", require("./routes/departmentRoutes"));
 app.use("/api/leave", require("./routes/leaveRoutes"));
 app.use("/api/tasks", require("./routes/taskRoutes"));
+app.use("/api/network", require("./routes/networkRoutes"));
 
 app.get("/api/analytics", (req, res) => {
   res.json({
