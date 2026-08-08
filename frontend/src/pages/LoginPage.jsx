@@ -7,7 +7,7 @@ export function LoginPage({ onLogin }) {
   const { dark, toggleTheme } = useTheme();
   const [mode, setMode] = useState("signin"); 
   const [email, setEmail] = useState("vanshikapeoplepulse@gmail.com");
-  const [password, setPassword] = useState("••••••••");
+  const [password, setPassword] = useState("password123");
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
