@@ -202,45 +202,6 @@ export function LoginPage({ onLogin }) {
           </form>
         )}
 
-        <div className="nf-login-divider" style={{ marginTop: 20 }}><span>select account role</span></div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 10 }}>
-          <button
-            type="button"
-            className="nf-btn ghost sm"
-            style={{ fontSize: 11.5, justifyContent: "center" }}
-            onClick={() => {
-              setMode("signin");
-              setEmail("adminpeoplepulse@gmail.com");
-              setPassword("");
-            }}
-          >
-            Admin
-          </button>
-          <button
-            type="button"
-            className="nf-btn ghost sm"
-            style={{ fontSize: 11.5, justifyContent: "center" }}
-            onClick={() => {
-              setMode("signin");
-              setEmail("managerpeoplepulse@gmail.com");
-              setPassword("");
-            }}
-          >
-            Manager
-          </button>
-          <button
-            type="button"
-            className="nf-btn ghost sm"
-            style={{ fontSize: 11.5, justifyContent: "center" }}
-            onClick={() => {
-              setMode("signin");
-              setEmail("vanshikapeoplepulse@gmail.com");
-              setPassword("");
-            }}
-          >
-            Employee
-          </button>
-        </div>
       </div>
     </div>
   );
