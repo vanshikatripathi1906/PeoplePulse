@@ -6,8 +6,8 @@ import { registerUserAPI } from "../services/api";
 export function LoginPage({ onLogin }) {
   const { dark, toggleTheme } = useTheme();
   const [mode, setMode] = useState("signin"); 
-  const [email, setEmail] = useState("vanshikapeoplepulse@gmail.com");
-  const [password, setPassword] = useState("password123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
   const [regPassword, setRegPassword] = useState("");
@@ -17,36 +17,14 @@ export function LoginPage({ onLogin }) {
   const [errorMessage, setErrorMessage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Check if current browser/device is the authorized owner laptop
-  const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
-  const isOwnerStored = typeof window !== "undefined" && localStorage.getItem("peoplepulse_owner_laptop") === "true";
-  const hasUrlOwnerKey = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("owner") === "van19shi";
-
-  if (hasUrlOwnerKey && !isOwnerStored && typeof window !== "undefined") {
-    localStorage.setItem("peoplepulse_owner_laptop", "true");
-  }
-
-  const isOwnerDevice = isLocalhost || isOwnerStored || hasUrlOwnerKey;
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage(null);
     setStatusMessage(null);
 
-    const isTargetingAdminOrManager =
-      email.toLowerCase().includes("admin") ||
-      email.toLowerCase().includes("manager") ||
-      email === "adminpeoplepulse@gmail.com" ||
-      email === "managerpeoplepulse@gmail.com";
-
     if (mode === "signin") {
-      if (isTargetingAdminOrManager && !isOwnerDevice) {
-        setErrorMessage("🔒 Restricted Access: Admin and Manager logins are restricted exclusively to the system owner's device. Please explore the portal using the Employee Demo account.");
-        return;
-      }
-
       try {
-        const targetRole = email.includes("admin") ? "Admin" : email.includes("manager") ? "Manager" : "Employee";
+        const targetRole = email.toLowerCase().includes("admin") ? "Admin" : email.toLowerCase().includes("manager") ? "Manager" : "Employee";
         await onLogin(targetRole, { email, password });
       } catch (err) {
         setErrorMessage(err?.response?.data?.message || err.message || "Invalid credentials or unapproved account.");
@@ -224,65 +202,45 @@ export function LoginPage({ onLogin }) {
           </form>
         )}
 
-        <div className="nf-login-divider" style={{ marginTop: 20 }}><span>fill demo credentials</span></div>
-        {isOwnerDevice ? (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 10 }}>
-            <button
-              type="button"
-              className="nf-btn ghost sm"
-              style={{ fontSize: 11.5, justifyContent: "center" }}
-              onClick={() => {
-                setMode("signin");
-                setEmail("adminpeoplepulse@gmail.com");
-                setPassword("admin123");
-              }}
-            >
-              Admin
-            </button>
-            <button
-              type="button"
-              className="nf-btn ghost sm"
-              style={{ fontSize: 11.5, justifyContent: "center" }}
-              onClick={() => {
-                setMode("signin");
-                setEmail("managerpeoplepulse@gmail.com");
-                setPassword("manager123");
-              }}
-            >
-              Manager
-            </button>
-            <button
-              type="button"
-              className="nf-btn ghost sm"
-              style={{ fontSize: 11.5, justifyContent: "center" }}
-              onClick={() => {
-                setMode("signin");
-                setEmail("vanshikapeoplepulse@gmail.com");
-                setPassword("employee123");
-              }}
-            >
-              Employee
-            </button>
-          </div>
-        ) : (
-          <div style={{ marginTop: 10, textAlign: "center" }}>
-            <button
-              type="button"
-              className="nf-btn primary sm"
-              style={{ width: "100%", justifyContent: "center", fontSize: 12.5, padding: "8px 14px" }}
-              onClick={() => {
-                setMode("signin");
-                setEmail("vanshikapeoplepulse@gmail.com");
-                setPassword("employee123");
-              }}
-            >
-              Load Employee Demo Credentials
-            </button>
-            <div style={{ fontSize: 11, color: "var(--ink-dim)", marginTop: 8 }}>
-              🔒 Admin &amp; Manager privileges restricted to system owner device
-            </div>
-          </div>
-        )}
+        <div className="nf-login-divider" style={{ marginTop: 20 }}><span>select account role</span></div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8, marginTop: 10 }}>
+          <button
+            type="button"
+            className="nf-btn ghost sm"
+            style={{ fontSize: 11.5, justifyContent: "center" }}
+            onClick={() => {
+              setMode("signin");
+              setEmail("adminpeoplepulse@gmail.com");
+              setPassword("");
+            }}
+          >
+            Admin
+          </button>
+          <button
+            type="button"
+            className="nf-btn ghost sm"
+            style={{ fontSize: 11.5, justifyContent: "center" }}
+            onClick={() => {
+              setMode("signin");
+              setEmail("managerpeoplepulse@gmail.com");
+              setPassword("");
+            }}
+          >
+            Manager
+          </button>
+          <button
+            type="button"
+            className="nf-btn ghost sm"
+            style={{ fontSize: 11.5, justifyContent: "center" }}
+            onClick={() => {
+              setMode("signin");
+              setEmail("vanshikapeoplepulse@gmail.com");
+              setPassword("");
+            }}
+          >
+            Employee
+          </button>
+        </div>
       </div>
     </div>
   );

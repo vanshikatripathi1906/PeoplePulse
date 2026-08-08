@@ -7,25 +7,21 @@ PeoplePulse is a full-stack HR management web app built using the MERN stack. It
 
 ---
 
-## Live Demo Login Credentials
+## Access Control & Security
 
-Try logging in with any of these accounts:
-
-- **Admin Account**: `adminpeoplepulse@gmail.com` / `admin123`
-- **Manager Account**: `managerpeoplepulse@gmail.com` / `manager123`
-- **Employee Account**: `vanshikapeoplepulse@gmail.com` / `employee123`
+The portal uses authentic email and password authentication. Users can sign in using registered Admin, Manager, or Employee accounts, or request new account access via the Sign Up form.
 
 ---
 
 ## Features
 
-- **Role-Based Access (Admin / Manager / Employee)**: Different dashboard views and permissions for each role.
+- **Role-Based Access (Admin / Manager / Employee)**: Custom dashboard views and permissions for each role.
 - **Employee Directory**: Manage employee profiles, departments, and designations.
-- **Attendance Tracking**: Punch in/out daily check-ins with attendance percentage calculations.
-- **Performance Evaluation**: Rating matrix and department rank tracking.
-- **Payroll**: View monthly salary breakdown and download salary slips.
-- **Events & Notifications**: Schedule meetings and send real-time alerts to target departments.
-- **Organization Chart**: Clean hierarchy showing Admin, Department Managers, and Employees.
+- **Attendance Tracking**: Daily check-in and check-out with attendance compliance metrics.
+- **Performance Evaluation**: Technical, communication, and leadership rating matrix.
+- **Payroll**: Scoped salary breakdown and downloadable salary slips.
+- **Events & Notifications**: Schedule meetings and send automated alerts to target departments.
+- **Organization Chart**: Visual hierarchy showing Executive Admin, Department Managers, and Employees.
 
 ---
 
@@ -33,7 +29,7 @@ Try logging in with any of these accounts:
 
 - **Frontend**: React.js, Vite, Lucide Icons, Vanilla CSS
 - **Backend**: Node.js, Express.js
-- **Database**: MongoDB Atlas (Mongoose)
+- **Database**: MongoDB Atlas (Mongoose ODM)
 - **Deployment**: Vercel (Frontend) & Render (Backend)
 
 ---
